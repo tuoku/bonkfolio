@@ -39,9 +39,9 @@ dependencies:
   pie_chart: ^5.1.0
   flutter_bloc: ^8.0.0
   bloc: ^8.0.1
-  fl_chart: ^0.40.2
+  fl_chart: ^0.46.0
   sqflite: ^2.0.1
-  qr_code_scanner: ^0.6.1
+  qr_code_scanner: ^0.7.0
   snapping_sheet: ^3.1.0
   fluttertoast: ^8.0.8
   flutter_slidable: ^1.2.0
