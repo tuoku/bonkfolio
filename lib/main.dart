@@ -12,13 +12,18 @@ Future main() async {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent));
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then((_) => 
-  runApp(MyApp()));
-  DatabaseRepo().init();
-  DatabaseRepo().getWallets();
-  CoinGeckoRepo().refreshLookupTable();
-}
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then((_) { 
 
+    DatabaseRepo().init().then((_) {
+     runApp(MyApp());
+    });
+    
+    CoinGeckoRepo().refreshLookupTable();
+
+  });
+  
+}
+ 
 class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
