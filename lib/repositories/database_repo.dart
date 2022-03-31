@@ -26,12 +26,11 @@ class DatabaseRepo {
       // constructed for each platform.
       join(await getDatabasesPath(), 'database.db'),
       // When the database is first created, create a table to store dogs.
-      onCreate: (db, version) async  {
+      onCreate: (db, version) async {
         // Run the CREATE TABLE statement on the database.
         await db.execute(
           'CREATE TABLE wallets(address TEXT, name TEXT)',
         );
-        
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
@@ -40,18 +39,16 @@ class DatabaseRepo {
   }
 
   Future<void> insertWallet(Wallet wallet) async {
-    final db = await database;
+    final db = database;
 
     await db?.insert(
       'wallets',
       wallet.toMap(),
-      
-     
     );
   }
 
   Future<List<Wallet>> getWallets() async {
-    final db = await database;
+    final db = database;
 
     final List<Map<String, dynamic>> maps = await db!.query('wallets');
 
@@ -63,7 +60,7 @@ class DatabaseRepo {
   }
 
   Future<void> deleteWallet(String address) async {
-    final db = await database;
+    final db = database;
 
     await db?.delete(
       'wallets',

@@ -7,7 +7,8 @@ class Crypto extends Asset {
 
   Crypto(
       {required double inferredAmount,
-      required double amountBought,   
+      required double realAmount,
+      required double amountBought,
       required String name,
       required double price,
       required String id,
@@ -16,10 +17,10 @@ class Crypto extends Asset {
       required List<PricePoint>? chart,
       required bool isSupported})
       : super(
-            amount: inferredAmount,
-            amountBought: amountBought,           
+            amount: realAmount,
+            amountBought: amountBought,
             avgBuyPrice: avgBuyPrice,
-            price: price,           
+            price: price,
             id: id,
             name: name,
             chart: chart,

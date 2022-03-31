@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class InfoTile extends StatefulWidget {
-  InfoTile({Key? key}) : super(key: key);
+  const InfoTile({Key? key}) : super(key: key);
 
   @override
   State<InfoTile> createState() => _InfoTileState();

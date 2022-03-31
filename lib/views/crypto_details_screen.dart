@@ -3,16 +3,13 @@ import 'package:intl/intl.dart';
 import 'package:mycryptos/models/asset.dart';
 import 'package:mycryptos/models/crypto.dart';
 import 'package:mycryptos/models/crypto_tx.dart';
-import 'package:mycryptos/models/pricepoint.dart';
 import 'package:mycryptos/repositories/xscan_repo.dart';
 import 'package:mycryptos/widgets/asset_graph.dart';
-import 'package:mycryptos/widgets/portfolio_graph.dart';
 import 'package:pie_chart/pie_chart.dart';
-import 'package:snapping_sheet/snapping_sheet.dart';
 
 class AssetDetailsScreen extends StatefulWidget {
   final Asset asset;
-  List<CryptoTX> txs = [];
+  final List<CryptoTX> txs = [];
 
   AssetDetailsScreen({
     Key? key,
@@ -38,7 +35,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
     });
   }
 
-  Widget graph = Center(child: CircularProgressIndicator());
+  Widget graph = const Center(child: CircularProgressIndicator());
 
   void enableGraph() {
     setState(() {
@@ -58,17 +55,16 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: CustomScrollView(
-            physics:
-                BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics()),
             slivers: [
           SliverAppBar(
             stretch: true,
             title: Text(widget.asset.name),
             expandedHeight: 350,
             flexibleSpace: FlexibleSpaceBar(
-              stretchModes: [StretchMode.zoomBackground],
-              background: InteractiveViewer(
-                  child: graph),
+              stretchModes: const [StretchMode.zoomBackground],
+              background: InteractiveViewer(child: graph),
             ),
           ),
           SliverList(
@@ -86,19 +82,19 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                           borderOnForeground: false,
                           child: Column(
                             children: [
-                              SizedBox(height: 10),
-                              Text(
+                              const SizedBox(height: 10),
+                              const Text(
                                 'Amount holding',
                                 style: TextStyle(fontSize: 15),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               Text(
                                 nf.format(widget.asset.amount),
-                                style: TextStyle(fontSize: 30),
+                                style: const TextStyle(fontSize: 30),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                             ],
@@ -111,20 +107,20 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                           borderOnForeground: false,
                           child: Column(
                             children: [
-                              SizedBox(height: 10),
-                              Text(
+                              const SizedBox(height: 10),
+                              const Text(
                                 'Reflections earned',
                                 style: TextStyle(fontSize: 15),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               Text(
                                 nf.format(widget.asset.amount -
                                     widget.asset.amountBought),
-                                style: TextStyle(fontSize: 30),
+                                style: const TextStyle(fontSize: 30),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                             ],
@@ -137,19 +133,19 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                           borderOnForeground: false,
                           child: Column(
                             children: [
-                              SizedBox(height: 10),
-                              Text(
+                              const SizedBox(height: 10),
+                              const Text(
                                 'Unrealized PnL',
                                 style: TextStyle(fontSize: 15),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               Text(
                                 '\$${(widget.asset.amount * widget.asset.price - widget.asset.amount * widget.asset.avgBuyPrice).toStringAsFixed(2)}',
-                                style: TextStyle(fontSize: 30),
+                                style: const TextStyle(fontSize: 30),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                             ],
@@ -166,58 +162,55 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                           borderOnForeground: false,
                           child: Column(
                             children: [
-                              SizedBox(height: 10),
-                              Text(
+                              const SizedBox(height: 10),
+                              const Text(
                                 'Cash value',
                                 style: TextStyle(fontSize: 15),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               Text(
                                 '\$' +
                                     (widget.asset.amount * widget.asset.price)
                                         .toStringAsFixed(2),
-                                style: TextStyle(fontSize: 30),
+                                style: const TextStyle(fontSize: 30),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 10,
                               ),
                               Text(
                                   '${(((widget.asset.amount * widget.asset.price) / 500) * 100).toStringAsFixed(1)}% of portfolio'),
-                              SizedBox(
+                              const SizedBox(
                                 height: 20,
                               ),
                               PieChart(
-                                
-                                gradientList: [
+                                gradientList: const [
                                   [
-                                    const Color(0xff23b6e6),
-                                    const Color(0xff02d39a),
+                                    Color(0xff23b6e6),
+                                    Color(0xff02d39a),
                                   ],
-                                 
                                 ],
                                 chartRadius:
                                     MediaQuery.of(context).size.width * 0.3,
                                 dataMap: {
-                                  
                                   'other': 100 -
                                       ((widget.asset.amount *
                                                   widget.asset.price) /
                                               500) *
                                           100,
-                                          'this': ((widget.asset.amount *
+                                  'this': ((widget.asset.amount *
                                               widget.asset.price) /
                                           500) *
                                       100,
                                 },
                                 chartType: ChartType.ring,
                                 legendOptions:
-                                    LegendOptions(showLegends: false),
-                                chartValuesOptions:
-                                    ChartValuesOptions(showChartValues: false),
+                                    const LegendOptions(showLegends: false),
+                                chartValuesOptions: const ChartValuesOptions(
+                                    showChartValues: false),
                               ),
-                              SizedBox(height: 15),
+                              const SizedBox(height: 15),
                             ],
                           ),
                         ),
@@ -226,49 +219,49 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                   ),
                 ],
               ),
-              Container(
+              SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: Card(
                     borderOnForeground: false,
                     child: Column(
                       children: [
-                        SizedBox(height: 10),
-                        Text(
+                        const SizedBox(height: 10),
+                        const Text(
                           'Weighted average buy price',
                           style: TextStyle(fontSize: 15),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Text(
                           widget.asset.avgBuyPrice.toString(),
-                          style: TextStyle(fontSize: 30),
+                          style: const TextStyle(fontSize: 30),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                       ],
                     ),
                   )),
-              Container(
+              SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: Card(
                     borderOnForeground: false,
                     child: Column(
                       children: [
-                        SizedBox(height: 10),
-                        Text(
+                        const SizedBox(height: 10),
+                        const Text(
                           'Current price',
                           style: TextStyle(fontSize: 15),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         Text(
                           widget.asset.price.toString(),
-                          style: TextStyle(fontSize: 30),
+                          style: const TextStyle(fontSize: 30),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                       ],

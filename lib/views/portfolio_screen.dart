@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:mycryptos/models/asset.dart';
 import 'package:mycryptos/models/crypto.dart';
-import 'package:mycryptos/models/crypto_tx.dart';
 import 'package:mycryptos/models/wallet.dart';
 import 'package:mycryptos/repositories/xscan_repo.dart';
 import 'package:mycryptos/repositories/coingecko_repo.dart';
@@ -13,13 +11,7 @@ import 'package:mycryptos/repositories/database_repo.dart';
 import 'package:mycryptos/views/tracked_sources_screen.dart';
 import 'package:mycryptos/widgets/asset_tile.dart';
 import 'package:mycryptos/widgets/asset_tile_shimmer.dart';
-import 'package:mycryptos/widgets/portfolio_graph.dart';
-import 'package:sqflite/sqflite.dart';
-import 'dart:convert';
-import 'dart:math';
 import 'dart:io' show Platform;
-import 'crypto_details_screen.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({Key? key, required this.title}) : super(key: key);
@@ -64,8 +56,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     bool txsLoading = true;
 
     final List<Asset> ls = [];
-    List<Crypto> bscs = [];
-    List<Crypto> eths = [];
     final addresses = wallets.map((e) => e.address).toList();
     XScanRepo().getAssets(addresses).then((value) {
       ls.addAll(value);
@@ -73,14 +63,16 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     });
 
     while (txsLoading) {
-      await Future.delayed(Duration(milliseconds: 1));
+      await Future.delayed(const Duration(milliseconds: 1));
     }
     double v = 0.0;
-    ls.forEach((e) {
+    for (var e in ls) {
       v += (e.amount * e.price);
-    });
+    }
     ls.sort((a, b) => (a.amount * a.price).compareTo((b.amount * b.price)));
-    print("RELOADED IN ${DateTime.now().millisecondsSinceEpoch - start}ms");
+    if (kDebugMode) {
+      ("RELOADED IN ${DateTime.now().millisecondsSinceEpoch - start}ms");
+    }
     setState(() {
       assets = ls.reversed.toList();
       portfolioValue = v;
@@ -99,7 +91,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         cgIds.add(
             CoinGeckoRepo().metas.firstWhere((e) => e.id == contract).cgId);
       } catch (e) {
-        print(e);
+        if (kDebugMode) print(e);
       }
     }
 
@@ -117,9 +109,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     assets.addAll(supported);
     assets.sort((a, b) => (a.amount * a.price).compareTo(b.amount * b.price));
     double v = 0.0;
-    assets.forEach((e) {
+    for (var e in assets) {
       v += (e.amount * e.price);
-    });
+    }
     setState(() {
       assets = assets.reversed.toList();
       portfolioValue = v;
@@ -127,7 +119,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   void changeTimeFrame(String frame) {
-    String url = '';
     switch (frame) {
       case 'day':
         break;
@@ -139,17 +130,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         break;
       default:
     }
-  }
-
-  double weightedAvgBuyPrice(List<CryptoTX> txs) {
-    final buys = txs.where((tx) => tx.action == "BUY");
-    final totalBuyAmount =
-        buys.fold(0, (prev, e) => (prev as double) + e.amount);
-    var sum = 0;
-    for (var buy in buys) {
-      // sum += buy.amount * buy.
-    }
-    return 0;
   }
 
   @override
@@ -166,18 +146,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
     return Scaffold(
         drawer: _drawer(),
         body: CustomScrollView(
-          cacheExtent: 3500,
+            cacheExtent: 3500,
             physics: (Platform.isIOS
-                ? AlwaysScrollableScrollPhysics()
-                : BouncingScrollPhysics(
+                ? const AlwaysScrollableScrollPhysics()
+                : const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics())),
             slivers: [
               SliverAppBar(
-                centerTitle: true,
-                title: Image(
-                  height: kToolbarHeight + 30,
-                  image: AssetImage('assets/logo.png'),
-                ),
+                  centerTitle: true,
+                  title: const Image(
+                    height: kToolbarHeight + 30,
+                    image: AssetImage('assets/logo.png'),
+                  ),
                   actions: [
                     PopupMenuButton<String>(onSelected: (string) {
                       if (string == "Force reload") {
@@ -191,11 +171,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       return [
                         CheckedPopupMenuItem<String>(
                           value: "Hide zero-ish",
-                          child: Text("Hide zero-ish"),
+                          child: const Text("Hide zero-ish"),
                           enabled: true,
                           checked: hidezero,
                         ),
-                        PopupMenuItem(
+                        const PopupMenuItem(
                           child: Align(
                               alignment: Alignment.centerRight,
                               child: Text("Force reload")),
@@ -215,9 +195,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   refreshTriggerPullDistance: 150.0,
                   refreshIndicatorExtent: 60.0,
                   onRefresh: refresh),
-                  wallets.isEmpty ? _addWalletsPrompt() : _assetList(),
-              
-              SliverPadding(padding: EdgeInsets.only(bottom: 40))
+              wallets.isEmpty ? _addWalletsPrompt() : _assetList(),
+              const SliverPadding(padding: EdgeInsets.only(bottom: 40))
             ]));
   }
 
@@ -227,7 +206,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         children: [
           DrawerHeader(
             child: Column(
-              children: [
+              children: const [
                 Expanded(
                     child: Image(
                   image: AssetImage('assets/logo.png'),
@@ -237,13 +216,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             ),
           ),
           ListTile(
-              title: Text("Tracked wallets"),
-              leading: Icon(Icons.attach_money),
+              title: const Text("Tracked wallets"),
+              leading: const Icon(Icons.attach_money),
               onTap: () {
                 Navigator.push<void>(
                   context,
                   MaterialPageRoute<void>(
-                    builder: (BuildContext context) => TrackedSourcesScreen(),
+                    builder: (BuildContext context) =>
+                        const TrackedSourcesScreen(),
                   ),
                 );
               })
@@ -261,18 +241,20 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         */
 
       Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-        SizedBox(
+        const SizedBox(
           height: 50,
         ),
-        Text('Total portfolio value'),
+        const Text('Total portfolio value'),
         Text(
           '\$' + portfolioValue.toStringAsFixed(2),
-          style: TextStyle(fontSize: 38,),
+          style: const TextStyle(
+            fontSize: 38,
+          ),
         ),
-        SizedBox(
+        const SizedBox(
           height: 30,
         ),
-        SizedBox(
+        const SizedBox(
           height: 10,
         ),
 
@@ -289,53 +271,61 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             },
             isSelected: selectedFrame),
             */
-        SizedBox(height: 50)
+        const SizedBox(height: 50)
       ]),
     ]);
   }
 
   Widget _assetList() {
     if (!isReloading) {
-          if(assets.isEmpty) {
-            WidgetsBinding.instance!.addPostFrameCallback((timestamp) {
-              reload();
-            });
-            return SliverFillRemaining(child: SizedBox());
-          }
+      if (assets.isEmpty) {
+        WidgetsBinding.instance!.addPostFrameCallback((timestamp) {
+          reload();
+        });
+        return const SliverFillRemaining(child: SizedBox());
+      }
     }
     return SliverList(
       delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
         if (!isReloading) {
-          
-        if (hidezero) {
-          if (assets[index].amount * assets[index].price > 1) {
+          if (hidezero) {
+            if (assets[index].amount * assets[index].price > 1) {
+              return AssetTile(
+                asset: assets[index],
+                pvalue: portfolioValue,
+              );
+            }
+          } else {
             return AssetTile(
               asset: assets[index],
               pvalue: portfolioValue,
             );
           }
         } else {
-          return AssetTile(
-            asset: assets[index],
-            pvalue: portfolioValue,
-          );
+          return const AssetTileShimmer();
         }
-        }
-        else {
-          return AssetTileShimmer();
-        }
+        return null;
       }, childCount: (assets.isEmpty ? 10 : assets.length)),
     );
   }
 
   Widget _addWalletsPrompt() {
-    return SliverFillRemaining(child: Center(child: Column(children: [
-      Text("You haven't added any wallets yet"),
-      TextButton(onPressed: () {
-        Navigator.push(
-          context,
-           MaterialPageRoute(builder: (BuildContext context) => TrackedSourcesScreen()));
-      }, child: Text("Add wallets"))
-    ],),));
+    return SliverFillRemaining(
+        child: Center(
+      child: Column(
+        children: [
+          const Text("You haven't added any wallets yet"),
+          TextButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) =>
+                            const TrackedSourcesScreen()));
+              },
+              child: const Text("Add wallets"))
+        ],
+      ),
+    ));
   }
 }
