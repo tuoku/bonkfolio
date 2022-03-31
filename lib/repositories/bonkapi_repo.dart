@@ -25,7 +25,8 @@ class BonkAPIRepo {
           "$_bonkApiBaseUrl/tokens/balances/$contracts/$holderAddress"));
       final json = jsonDecode(res.body) as List<dynamic>;
       for (var e in json) {
-        map[(e["contract"] ?? "")] = BigInt.parse((e["balance"] ?? "0")); // change type to BigInt
+        map[(e["contract"] ?? "")] =
+            BigInt.parse((e["balance"] ?? "0")); // change type to BigInt
       }
       return map;
     } catch (e) {

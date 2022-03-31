@@ -197,10 +197,8 @@ class XScanRepo {
     for (var t in toBuild) {
       fs.add(constructCrypto(t));
     }
-    
-    
-    
-    while(balancesFetching) {
+
+    while (balancesFetching) {
       await Future.delayed(ms);
     }
 
@@ -217,7 +215,7 @@ class XScanRepo {
     return assets;
   }
 
-  Future<Map<String,BigInt>> getRealBalances(contracts, holder) async {
+  Future<Map<String, BigInt>> getRealBalances(contracts, holder) async {
     balancesFetching = true;
     final val = await BonkAPIRepo().getTokenBalances(contracts, holder);
     balancesFetching = false;
@@ -225,12 +223,12 @@ class XScanRepo {
   }
 
   Future<Crypto?> constructCrypto(CryptoTX tx) async {
-    while(balancesFetching) {
+    while (balancesFetching) {
       await Future.delayed(ms);
     }
     isBuilding = true;
     final start = DateTime.now().millisecondsSinceEpoch;
-    
+
     final txs = txCache
         .where((txx) => tx.contractAddress == txx.contractAddress)
         .toList();
@@ -257,9 +255,9 @@ class XScanRepo {
       return Crypto(
           amountBought: tx.amount,
           inferredAmount: amount,
-          realAmount: (
-            (balanceCache[tx.contractAddress.toLowerCase()]
-             ?? BigInt.one) / BigInt.from((pow(10.0, tx.decimals)))),
+          realAmount:
+              ((balanceCache[tx.contractAddress.toLowerCase()] ?? BigInt.one) /
+                  BigInt.from((pow(10.0, tx.decimals)))),
           price: charts?.last.price ?? 0,
           name: tx.name,
           id: tx.id,
