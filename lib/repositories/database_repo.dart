@@ -12,26 +12,25 @@ class DatabaseRepo {
 
   DatabaseRepo._internal();
 
-  var database;
+  Database? database;
   List<Wallet> walletCache = [];
 
-  void init() async {
+  Future<void> init() async {
     // Avoid errors caused by flutter upgrade.
 // Importing 'package:flutter/widgets.dart' is required.
     WidgetsFlutterBinding.ensureInitialized();
 // Open the database and store the reference.
-    database = openDatabase(
+    database = await openDatabase(
       // Set the path to the database. Note: Using the `join` function from the
       // `path` package is best practice to ensure the path is correctly
       // constructed for each platform.
       join(await getDatabasesPath(), 'database.db'),
       // When the database is first created, create a table to store dogs.
-      onCreate: (db, version) async  {
+      onCreate: (db, version) async {
         // Run the CREATE TABLE statement on the database.
         await db.execute(
           'CREATE TABLE wallets(address TEXT, name TEXT)',
         );
-        
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
@@ -40,20 +39,18 @@ class DatabaseRepo {
   }
 
   Future<void> insertWallet(Wallet wallet) async {
-    final db = await database;
+    final db = database;
 
-    await db.insert(
+    await db?.insert(
       'wallets',
       wallet.toMap(),
-      
-     
     );
   }
 
   Future<List<Wallet>> getWallets() async {
-    final db = await database;
+    final db = database;
 
-    final List<Map<String, dynamic>> maps = await db.query('wallets');
+    final List<Map<String, dynamic>> maps = await db!.query('wallets');
 
     final ls = List.generate(maps.length, (i) {
       return Wallet(address: maps[i]['address'], name: maps[i]['name']);
@@ -63,9 +60,9 @@ class DatabaseRepo {
   }
 
   Future<void> deleteWallet(String address) async {
-    final db = await database;
+    final db = database;
 
-    await db.delete(
+    await db?.delete(
       'wallets',
       where: 'address = ?',
       whereArgs: [address],

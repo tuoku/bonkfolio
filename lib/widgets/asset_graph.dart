@@ -7,10 +7,10 @@ import 'package:mycryptos/models/crypto_tx.dart';
 import 'package:mycryptos/models/pricepoint.dart';
 
 class AssetGraph extends StatefulWidget {
-  AssetGraph({Key? key, required this.data, required this.charts})
+  const AssetGraph({Key? key, required this.data, required this.charts})
       : super(key: key);
-  List<CryptoTX> data;
-  List<PricePoint> charts;
+  final List<CryptoTX> data;
+  final List<PricePoint> charts;
 
   @override
   _AssetGraphState createState() => _AssetGraphState();
@@ -23,7 +23,7 @@ class _AssetGraphState extends State<AssetGraph> {
   ];
 
   bool showAvg = false;
-   double minX = 0;
+  double minX = 0;
   double maxX = 0;
   double minY = 0;
   double maxY = 0;
@@ -33,105 +33,101 @@ class _AssetGraphState extends State<AssetGraph> {
 
   }
 */
-@override
-void initState() {
-  super.initState();
-  widget.charts.asMap().entries.map((e) {
-    int i = e.key;
-    if (e.value.time.day == widget.charts[i-1].time.day) {
-      widget.charts.removeAt(i);
-    }
+  @override
+  void initState() {
+    super.initState();
+    widget.charts.asMap().entries.map((e) {
+      int i = e.key;
+      if (e.value.time.day == widget.charts[i - 1].time.day) {
+        widget.charts.removeAt(i);
+      }
+    });
+    final top = widget.charts.fold(
+        widget.charts[0].price,
+        (previousValue, element) => previousValue as double > element.price
+            ? previousValue
+            : element.price);
 
-  });
-  final top = widget.charts.fold(
-          widget.charts[0].price,
-          (previousValue, element) =>
-              previousValue as double > element.price ? previousValue : element.price);
+    final bottom = widget.charts.fold(
+        widget.charts[0].price,
+        (previousValue, element) => previousValue as double < element.price
+            ? previousValue
+            : element.price);
 
-  final bottom = widget.charts.fold(
-          widget.charts[0].price,
-          (previousValue, element) =>
-              previousValue as double < element.price ? previousValue : element.price);
+    final range = top - bottom;
 
-  final range = top - bottom;
+    minX = widget.charts.first.time.millisecondsSinceEpoch.toDouble();
+    maxX = widget.charts.last.time.millisecondsSinceEpoch.toDouble();
+    maxY = range + top;
+    minY = max(range - bottom, 0);
 
-  minX = widget.charts.first.time.millisecondsSinceEpoch.toDouble();
-  maxX = widget.charts.last.time.millisecondsSinceEpoch.toDouble();
-  maxY = range + top;
-  minY = max(range - bottom, 0);
+    if (kDebugMode) print("BOTTOM: $bottom");
+    if (kDebugMode) print("TOP: $top");
+    if (kDebugMode) print("minY: $minY, maxY: $maxY");
 
-  print("BOTTOM: $bottom");
-  print("TOP: $top");
-  print("minY: $minY, maxY: $maxY");
-
-  resultsLength = widget.charts.last.time.millisecondsSinceEpoch.toDouble();
-}
-
-List<FlSpot> spotss = [];
-
-List<PricePoint> reducedChart = [];
-
-
-
-Future<Widget> graph() async {
-  Map map = Map();
-  map['data'] = widget.data;
-  map['charts'] = widget.charts;
-  spotss = await compute(calcSpots, map);
-  for (var i = 0; i <= widget.charts.length; i++) {
-    if(i % 10 == 0) {
-      reducedChart.add(widget.charts[i]);
-    }
+    resultsLength = widget.charts.last.time.millisecondsSinceEpoch.toDouble();
   }
-  return LineChart(
-                mainData(),
-              );
-}
+
+  List<FlSpot> spotss = [];
+
+  List<PricePoint> reducedChart = [];
+
+  Future<Widget> graph() async {
+    Map map = {};
+    map['data'] = widget.data;
+    map['charts'] = widget.charts;
+    spotss = await compute(calcSpots, map);
+    for (var i = 0; i <= widget.charts.length; i++) {
+      if (i % 10 == 0) {
+        reducedChart.add(widget.charts[i]);
+      }
+    }
+    return LineChart(
+      mainData(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<dynamic>(
-        future: graph(),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          Widget child;
-          if (snapshot.hasData) {
-            child = snapshot.data; 
-          } else if (snapshot.hasError) {
-            child = 
-              const Icon(
-                Icons.error_outline,
-                color: Colors.red,
-                size: 60,
-              );
-              
-          } else {
-            child = 
-              const Center(
-                
-                child: CircularProgressIndicator(),
-              );
-          }
-          return child;
-        },
-      );
-            
-            
+      future: graph(),
+      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        Widget child;
+        if (snapshot.hasData) {
+          child = snapshot.data;
+        } else if (snapshot.hasError) {
+          child = const Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          );
+        } else {
+          child = const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        return child;
+      },
+    );
   }
 
   LineChartData mainData() {
     return LineChartData(
       lineTouchData: LineTouchData(
-        handleBuiltInTouches: false,
-        enabled: false,
-        touchTooltipData: LineTouchTooltipData(
-          getTooltipItems: (touchedSpots) {
-            List<LineTooltipItem> items = [];
-            for (var spot in touchedSpots) {
-              items.add(LineTooltipItem(DateTime.fromMillisecondsSinceEpoch(spot.x.toInt()).toString(), TextStyle()));
-            }
-            return items;
-          },
-        )
-      ),
+          handleBuiltInTouches: false,
+          enabled: false,
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipItems: (touchedSpots) {
+              List<LineTooltipItem> items = [];
+              for (var spot in touchedSpots) {
+                items.add(LineTooltipItem(
+                    DateTime.fromMillisecondsSinceEpoch(spot.x.toInt())
+                        .toString(),
+                    const TextStyle()));
+              }
+              return items;
+            },
+          )),
       gridData: FlGridData(
         show: false,
       ),
@@ -142,7 +138,8 @@ Future<Widget> graph() async {
         bottomTitles: SideTitles(
           showTitles: true,
           getTitles: (value) {
-           return DateTime.fromMillisecondsSinceEpoch(value.toInt()).toString();
+            return DateTime.fromMillisecondsSinceEpoch(value.toInt())
+                .toString();
           },
         ),
         leftTitles: SideTitles(
@@ -214,26 +211,28 @@ Future<List<FlSpot>> calcSpots(map) async {
   final data = map['data'];
   final charts = map['charts'];
   return List.generate(
-              data.length,
-              (i) => FlSpot(
-                  data[i].time.millisecondsSinceEpoch.toDouble(),
-                  charts
-                      .firstWhere((e) =>
-                          e.time.millisecondsSinceEpoch.toDouble() ==
-                          (charts.fold(
-                              charts[0].time.millisecondsSinceEpoch
-                                  .toDouble(),
-                              (previousValue, element) =>
-                                  (element.time.millisecondsSinceEpoch.toDouble() -
-                                                  data[i].time.millisecondsSinceEpoch
-                                                      .toDouble())
-                                              .abs() <
-                                          ((previousValue as double) -
-                                                  data[i].time
-                                                      .millisecondsSinceEpoch
-                                                      .toDouble())
-                                              .abs()
-                                      ? element.time.millisecondsSinceEpoch.toDouble()
-                                      : previousValue)))
-                      .price));
+      data.length,
+      (i) => FlSpot(
+          data[i].time.millisecondsSinceEpoch.toDouble(),
+          charts
+              .firstWhere((e) =>
+                  e.time.millisecondsSinceEpoch.toDouble() ==
+                  (charts.fold(
+                      charts[0].time.millisecondsSinceEpoch.toDouble(),
+                      (previousValue, element) =>
+                          (element.time.millisecondsSinceEpoch.toDouble() -
+                                          data[i]
+                                              .time
+                                              .millisecondsSinceEpoch
+                                              .toDouble())
+                                      .abs() <
+                                  ((previousValue as double) -
+                                          data[i]
+                                              .time
+                                              .millisecondsSinceEpoch
+                                              .toDouble())
+                                      .abs()
+                              ? element.time.millisecondsSinceEpoch.toDouble()
+                              : previousValue)))
+              .price));
 }

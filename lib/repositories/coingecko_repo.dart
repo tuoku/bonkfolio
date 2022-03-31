@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:mycryptos/models/asset_meta.dart';
@@ -40,33 +41,32 @@ class CoinGeckoRepo {
   }
 */
   Future<void> getInfosByContract(String contract, String platform) async {
-    http.Response res = await http.get(Uri.parse(
-        '$_baseUrl/coins/$platform/contract/$contract'));
-        final m = jsonDecode(res.body);
+    http.Response res = await http
+        .get(Uri.parse('$_baseUrl/coins/$platform/contract/$contract'));
+    final m = jsonDecode(res.body);
 
     if (metas
         .where((element) => element.id == contract && element.thumbnail != null)
         .isEmpty) {
-      metas.add(AssetMeta(id: contract, thumbnail: m['image']['small'], cgId: m['id']));
+      metas.add(AssetMeta(
+          id: contract, thumbnail: m['image']['small'], cgId: m['id']));
     }
-
   }
 
   Future<Map> getPricesByIDs(List<String> ids) async {
     String ss = "";
     for (var id in ids) {
       ss += '$id,';
-    } 
-    http.Response res = await http.get(Uri.parse(
-      '$_baseUrl/simple/price?ids=$ss&vs_currencies=usd'));
-      final body = jsonDecode(res.body);
+    }
+    http.Response res = await http
+        .get(Uri.parse('$_baseUrl/simple/price?ids=$ss&vs_currencies=usd'));
+    final body = jsonDecode(res.body);
 
-      Map map = Map();
-      for (var id in ids) {
-        map[id] = body[id]['usd'];
-      }
-      return map;
-
+    Map map = {};
+    for (var id in ids) {
+      map[id] = body[id]['usd'];
+    }
+    return map;
   }
 
   Future<double> getPriceAt(DateTime time, String id) async {
@@ -77,7 +77,7 @@ class CoinGeckoRepo {
     try {
       d = (jsonDecode(res.body)['market_data']['current_price'])['usd'];
     } catch (e) {
-      print(e);
+      if (kDebugMode) print(e);
     }
     return d;
   }
@@ -89,7 +89,7 @@ class CoinGeckoRepo {
       try {
         table[body[i]['id']] = body[i]['symbol'];
       } catch (e) {
-        print(e);
+        if (kDebugMode) print(e);
         break;
       }
     }
@@ -107,11 +107,12 @@ class CoinGeckoRepo {
             price: (m['prices'][index][1])));
   }
 
-  Future<List<PricePoint>?> getChartsByContract(String contract, String platform, int days) async {
+  Future<List<PricePoint>?> getChartsByContract(
+      String contract, String platform, int days) async {
     http.Response res = await http.get(Uri.parse(
         '$_baseUrl/coins/$platform/contract/$contract/market_chart?vs_currency=usd&days=$days'));
     final m = jsonDecode(res.body);
-    if(res.statusCode != 200) return null;
+    if (res.statusCode != 200) return null;
     return List.generate(
         m['prices'].length,
         (index) => PricePoint(
@@ -146,11 +147,12 @@ class CoinGeckoRepo {
         idList += id;
       }
     }
-    http.Response res = await http.get(Uri.parse('$_baseUrl/simple/price?ids=$idList&vs_currencies=usd'));
+    http.Response res = await http
+        .get(Uri.parse('$_baseUrl/simple/price?ids=$idList&vs_currencies=usd'));
     final m = jsonDecode(res.body);
-    
+
     Map<String, double> map = {};
-    for (var i = 0; i <= m.length -1; i++) {
+    for (var i = 0; i <= m.length - 1; i++) {
       map[m[i].key] = m[i]["usd"];
     }
     return map;

@@ -84,10 +84,10 @@ class _PortfolioGraphState extends State<PortfolioGraph> {
       borderData: FlBorderData(
           show: false,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
-      minX: 0,//widget.data[0].boughtAt.millisecondsSinceEpoch.toDouble(),
+      minX: 0, //widget.data[0].boughtAt.millisecondsSinceEpoch.toDouble(),
       maxX: DateTime.now().millisecondsSinceEpoch.toDouble(),
       minY: 0,
-      maxY: this.widget.data[0].price,
+      maxY: widget.data[0].price,
       lineBarsData: [
         LineChartBarData(
           spots: [

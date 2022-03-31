@@ -9,18 +9,20 @@ import 'package:flutter/services.dart';
 Future main() async {
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent));
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then((_) => 
-  runApp(MyApp()));
-  DatabaseRepo().init();
-  DatabaseRepo().getWallets();
-  CoinGeckoRepo().refreshLookupTable();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then((_) {
+    DatabaseRepo().init().then((_) {
+      runApp(const MyApp());
+    });
+
+    CoinGeckoRepo().refreshLookupTable();
+  });
 }
 
 class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +34,8 @@ class MyApp extends StatelessWidget {
         canvasColor: Colors.black,
         cardColor: Colors.black,
         appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
-        
       ),
-      
-      home: PortfolioScreen(
+      home: const PortfolioScreen(
         title: 'Bonkfolio',
         key: GlobalKeys.portfolioKey,
       ),
