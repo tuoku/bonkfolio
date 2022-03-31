@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:mycryptos/models/crypto.dart';
 import 'package:mycryptos/models/crypto_tx.dart';
 import 'package:mycryptos/models/pricepoint.dart';
+import 'package:mycryptos/repositories/bonkapi_repo.dart';
 import 'package:mycryptos/repositories/coingecko_repo.dart';
 import 'package:mycryptos/repositories/database_repo.dart';
 
@@ -29,8 +30,10 @@ class XScanRepo {
 
   List<CryptoTX> txCache = [];
   List<String> ignoredContracts = [];
+  Map<String, BigInt> balanceCache = {};
 
   bool isBuilding = false;
+  bool balancesFetching = false;
 
   static const ms = Duration(milliseconds: 1);
 
@@ -78,12 +81,15 @@ class XScanRepo {
     for (var i = 0; i <= fetchedTXs.length - 1; i++) {
       final res = fetchedTXs[i] as http.Response;
       var platform = "";
-      if (res.request!.url.toString().contains(_bscScanBaseUrl))
+      if (res.request!.url.toString().contains(_bscScanBaseUrl)) {
         platform = "binance-smart-chain";
-      if (res.request!.url.toString().contains(_etherScanBaseUrl))
+      }
+      if (res.request!.url.toString().contains(_etherScanBaseUrl)) {
         platform = "ethereum";
-      if (res.request!.url.toString().contains(_snowTraceBaseUrl))
+      }
+      if (res.request!.url.toString().contains(_snowTraceBaseUrl)) {
         platform = "avalanche";
+      }
 
       final txs = jsonDecode(res.body)['result'];
       for (var ii = 0; ii <= txs.length - 1; ii++) {
@@ -102,7 +108,7 @@ class XScanRepo {
               platform: platform);
           allTXs.add(a);
         } catch (e) {
-          print(e);
+          if (kDebugMode) print(e);
         }
       }
     }
@@ -114,7 +120,7 @@ class XScanRepo {
   Future<List<CryptoTX>?> getBNBTXs(String address) async {
     http.Response res = await http.get(Uri.parse(
         '$_bscScanBaseUrl?module=account&action=txlist&address=$address&startblock=0&endblock=999999999&sort=asc&apikey=$_bscScanApiKey'));
-    print(res.statusCode);
+    if (kDebugMode) print(res.statusCode);
     try {
       final txs = jsonDecode(res.body)['result'] as List<dynamic>;
       List<CryptoTX> ls = [];
@@ -143,8 +149,9 @@ class XScanRepo {
         return ls;
       }
     } catch (e) {
-      print(e);
+      if (kDebugMode) print(e);
     }
+    return null;
   }
 
   /// Returns a list of crypto assets found in wallet [addresses].
@@ -152,7 +159,7 @@ class XScanRepo {
     final futures = <Future>[];
     for (var address in addresses) {
       futures.add(getTXs(address.toLowerCase()));
-     // futures.add(getBNBTXs(address.toLowerCase()));
+      // futures.add(getBNBTXs(address.toLowerCase()));
     }
 
     final fetched = await Future.wait(futures);
@@ -178,8 +185,21 @@ class XScanRepo {
       }
     }
     final List<Future> fs = [];
+    final List<String> balancesToGet = [];
+    //balanceCache.clear();
+
+    for (var t in toBuild) {
+      balancesToGet.add(t.contractAddress);
+    }
+    final balances = await getRealBalances(balancesToGet, addresses[0]);
+    balanceCache.addAll(balances);
+
     for (var t in toBuild) {
       fs.add(constructCrypto(t));
+    }
+
+    while (balancesFetching) {
+      await Future.delayed(ms);
     }
 
     final built = await Future.wait(fs);
@@ -195,9 +215,20 @@ class XScanRepo {
     return assets;
   }
 
+  Future<Map<String, BigInt>> getRealBalances(contracts, holder) async {
+    balancesFetching = true;
+    final val = await BonkAPIRepo().getTokenBalances(contracts, holder);
+    balancesFetching = false;
+    return val;
+  }
+
   Future<Crypto?> constructCrypto(CryptoTX tx) async {
+    while (balancesFetching) {
+      await Future.delayed(ms);
+    }
     isBuilding = true;
     final start = DateTime.now().millisecondsSinceEpoch;
+
     final txs = txCache
         .where((txx) => tx.contractAddress == txx.contractAddress)
         .toList();
@@ -224,6 +255,9 @@ class XScanRepo {
       return Crypto(
           amountBought: tx.amount,
           inferredAmount: amount,
+          realAmount:
+              ((balanceCache[tx.contractAddress.toLowerCase()] ?? BigInt.one) /
+                  BigInt.from((pow(10.0, tx.decimals)))),
           price: charts?.last.price ?? 0,
           name: tx.name,
           id: tx.id,
@@ -267,7 +301,7 @@ class XScanRepo {
     final buys = txs.where((tx) => tx.action == "BUY").toList();
     List<Future<double>> buyFutures = [];
     for (var tx in buys) {
-      Map map = Map();
+      Map map = {};
       map['time'] = tx.time;
       map['chart'] = chart;
       buyFutures.add(compute(findBuyPrice, map));

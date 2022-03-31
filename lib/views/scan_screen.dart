@@ -4,20 +4,19 @@ import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io' show Platform;
 
 class ScanScreen extends StatefulWidget {
-  ScanScreen({Key? key}) : super(key: key);
+  const ScanScreen({Key? key}) : super(key: key);
 
   @override
   _ScanScreenState createState() => _ScanScreenState();
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Barcode? result;
   QRViewController? controller;
   bool foundQr = false;
 
-   // In order to get hot reload to work we need to pause the camera if the platform
+  // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
   void reassemble() {
@@ -29,7 +28,7 @@ class _ScanScreenState extends State<ScanScreen> {
       controller!.resumeCamera();
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -48,7 +47,7 @@ class _ScanScreenState extends State<ScanScreen> {
               child: (result != null)
                   ? Text(
                       'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                  : Text('Scan a code'),
+                  : const Text('Scan a code'),
             ),
           )
         ],
@@ -56,17 +55,17 @@ class _ScanScreenState extends State<ScanScreen> {
     );
   }
 
-   void _onQRViewCreated(QRViewController controller) {
+  void _onQRViewCreated(QRViewController controller) {
     this.controller = controller;
-          controller.resumeCamera();
+    controller.resumeCamera();
 
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         result = scanData;
       });
-      if(result != null && !foundQr){
+      if (result != null && !foundQr) {
         foundQr = true;
-        print(result!.code!);
+        if (kDebugMode) print(result!.code!);
         Navigator.of(context).pop(result!.code!.split(":").last);
       }
     });
