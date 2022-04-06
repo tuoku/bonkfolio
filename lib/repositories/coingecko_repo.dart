@@ -89,7 +89,7 @@ class CoinGeckoRepo {
       try {
         table[body[i]['id']] = body[i]['symbol'];
       } catch (e) {
-        if(kDebugMode) print(e);
+        if (kDebugMode) print(e);
         break;
       }
     }

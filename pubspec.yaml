@@ -41,12 +41,12 @@ dependencies:
   bloc: ^8.0.1
   fl_chart: ^0.46.0
   sqflite: ^2.0.1
-  qr_code_scanner: ^0.7.0
   snapping_sheet: ^3.1.0
   fluttertoast: ^8.0.8
   flutter_slidable: ^1.2.0
   shimmer: ^2.0.0
   flutter_dotenv: ^5.0.2
+  mobile_scanner: ^1.0.0
 
 dev_dependencies:
   flutter_test:
