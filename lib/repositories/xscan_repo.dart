@@ -236,7 +236,8 @@ class XScanRepo {
         0.0,
         (pv, tx) =>
             (pv as double) + (tx.action == "BUY" ? tx.amount : tx.amount * -1));
-    if (amount > 0.0 || tx.id == "BNB") {
+    if (((balanceCache[tx.contractAddress.toLowerCase()] ?? BigInt.one) /
+                  BigInt.from((pow(10.0, tx.decimals)))) > 0.0 || tx.id == "BNB") {
       final txss = txs;
       txss.sort((a, b) => a.time.compareTo(b.time));
       final daysSinceFirstTx =
