@@ -1,4 +1,4 @@
-name: mycryptos
+name: bonkfolio
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -39,7 +39,7 @@ dependencies:
   pie_chart: ^5.1.0
   flutter_bloc: ^8.0.0
   bloc: ^8.0.1
-  fl_chart: ^0.46.0
+  fl_chart: ^0.50.1
   sqflite: ^2.0.1
   snapping_sheet: ^3.1.0
   fluttertoast: ^8.0.8

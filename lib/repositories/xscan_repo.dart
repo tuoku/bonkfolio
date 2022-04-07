@@ -4,12 +4,12 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:mycryptos/models/crypto.dart';
-import 'package:mycryptos/models/crypto_tx.dart';
-import 'package:mycryptos/models/pricepoint.dart';
-import 'package:mycryptos/repositories/bonkapi_repo.dart';
-import 'package:mycryptos/repositories/coingecko_repo.dart';
-import 'package:mycryptos/repositories/database_repo.dart';
+import 'package:bonkfolio/models/crypto.dart';
+import 'package:bonkfolio/models/crypto_tx.dart';
+import 'package:bonkfolio/models/pricepoint.dart';
+import 'package:bonkfolio/repositories/bonkapi_repo.dart';
+import 'package:bonkfolio/repositories/coingecko_repo.dart';
+import 'package:bonkfolio/repositories/database_repo.dart';
 
 class XScanRepo {
   static final XScanRepo _bscScanRepo = XScanRepo._internal();
@@ -185,14 +185,39 @@ class XScanRepo {
       }
     }
     final List<Future> fs = [];
-    final List<String> balancesToGet = [];
+    final List<String> bscBalancesToGet = [];
+    final List<String> ethBalancesToGet = [];
+    final List<String> avaxBalancesToGet = [];
     //balanceCache.clear();
 
     for (var t in toBuild) {
-      balancesToGet.add(t.contractAddress);
+      switch (t.platform) {
+        case "binance-smart-chain":
+          bscBalancesToGet.add(t.contractAddress);
+          break;
+        case "ethereum":
+          ethBalancesToGet.add(t.contractAddress);
+          break;
+        case "avalanche":
+          avaxBalancesToGet.add(t.contractAddress);
+          break;
+        default:
+          bscBalancesToGet.add(t.contractAddress);
+          break;
+      }
     }
-    final balances = await getRealBalances(balancesToGet, addresses[0]);
-    balanceCache.addAll(balances);
+
+    final List<Future> balanceFs = [];
+    balanceFs.add(
+        getRealBalances("binance-smart-chain", bscBalancesToGet, addresses[0]));
+    balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, addresses[0]));
+    balanceFs
+        .add(getRealBalances("avalanche", avaxBalancesToGet, addresses[0]));
+
+    final balances = await Future.wait(balanceFs);
+    for (var f in balances) {
+      balanceCache.addAll(f);
+    }
 
     for (var t in toBuild) {
       fs.add(constructCrypto(t));
@@ -215,9 +240,11 @@ class XScanRepo {
     return assets;
   }
 
-  Future<Map<String, BigInt>> getRealBalances(contracts, holder) async {
+  Future<Map<String, BigInt>> getRealBalances(
+      platform, contracts, holder) async {
     balancesFetching = true;
-    final val = await BonkAPIRepo().getTokenBalances(contracts, holder);
+    final val =
+        await BonkAPIRepo().getTokenBalances(platform, contracts, holder);
     balancesFetching = false;
     return val;
   }

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:mycryptos/models/wallet.dart';
+import 'package:bonkfolio/models/wallet.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 

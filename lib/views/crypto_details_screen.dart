@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mycryptos/models/asset.dart';
-import 'package:mycryptos/models/crypto.dart';
-import 'package:mycryptos/models/crypto_tx.dart';
-import 'package:mycryptos/repositories/xscan_repo.dart';
-import 'package:mycryptos/widgets/asset_graph.dart';
+import 'package:bonkfolio/models/asset.dart';
+import 'package:bonkfolio/models/crypto.dart';
+import 'package:bonkfolio/models/crypto_tx.dart';
+import 'package:bonkfolio/repositories/xscan_repo.dart';
+import 'package:bonkfolio/widgets/asset_graph.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class AssetDetailsScreen extends StatefulWidget {
   final Asset asset;
   final List<CryptoTX> txs = [];
+  final double pValue;
 
   AssetDetailsScreen({
     Key? key,
     required this.asset,
+    required this.pValue,
   }) : super(
           key: key,
         );
@@ -180,7 +182,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                                 height: 10,
                               ),
                               Text(
-                                  '${(((widget.asset.amount * widget.asset.price) / 500) * 100).toStringAsFixed(1)}% of portfolio'),
+                                  '${(((widget.asset.amount * widget.asset.price) / widget.pValue) * 100).toStringAsFixed(1)}% of portfolio'),
                               const SizedBox(
                                 height: 20,
                               ),
@@ -197,11 +199,11 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                                   'other': 100 -
                                       ((widget.asset.amount *
                                                   widget.asset.price) /
-                                              500) *
+                                              widget.pValue) *
                                           100,
                                   'this': ((widget.asset.amount *
                                               widget.asset.price) /
-                                          500) *
+                                          widget.pValue) *
                                       100,
                                 },
                                 chartType: ChartType.ring,

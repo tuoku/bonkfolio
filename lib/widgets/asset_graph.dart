@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mycryptos/models/crypto_tx.dart';
-import 'package:mycryptos/models/pricepoint.dart';
+import 'package:bonkfolio/models/crypto_tx.dart';
+import 'package:bonkfolio/models/pricepoint.dart';
 
 class AssetGraph extends StatefulWidget {
   const AssetGraph({Key? key, required this.data, required this.charts})
@@ -131,40 +131,7 @@ class _AssetGraphState extends State<AssetGraph> {
       gridData: FlGridData(
         show: false,
       ),
-      titlesData: FlTitlesData(
-        show: false,
-        rightTitles: SideTitles(showTitles: false),
-        topTitles: SideTitles(showTitles: false),
-        bottomTitles: SideTitles(
-          showTitles: true,
-          getTitles: (value) {
-            return DateTime.fromMillisecondsSinceEpoch(value.toInt())
-                .toString();
-          },
-        ),
-        leftTitles: SideTitles(
-          showTitles: false,
-          interval: 1,
-          getTextStyles: (context, value) => const TextStyle(
-            color: Color(0xff67727d),
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 1:
-                return '10k';
-              case 3:
-                return '30k';
-              case 5:
-                return '50k';
-            }
-            return '';
-          },
-          reservedSize: 32,
-          margin: 12,
-        ),
-      ),
+      titlesData: FlTitlesData(show: false),
       borderData: FlBorderData(
           show: false,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -180,8 +147,10 @@ class _AssetGraphState extends State<AssetGraph> {
                   reducedChart[index].time.millisecondsSinceEpoch.toDouble(),
                   reducedChart[index].price)),
           isCurved: true,
-          colors:
-              gradientColors.map((color) => color.withOpacity(1.0)).toList(),
+          gradient: LinearGradient(
+            colors:
+                gradientColors.map((color) => color.withOpacity(1.0)).toList(),
+          ),
           barWidth: 5,
           isStrokeCapRound: true,
           dotData: FlDotData(
@@ -189,8 +158,11 @@ class _AssetGraphState extends State<AssetGraph> {
           ),
           belowBarData: BarAreaData(
             show: true,
-            colors:
-                gradientColors.map((color) => color.withOpacity(0.2)).toList(),
+            gradient: LinearGradient(
+              colors: gradientColors
+                  .map((color) => color.withOpacity(0.2))
+                  .toList(),
+            ),
           ),
         ),
         LineChartBarData(
