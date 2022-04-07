@@ -131,7 +131,7 @@ class _AssetGraphState extends State<AssetGraph> {
       gridData: FlGridData(
         show: false,
       ),
-      
+      titlesData: FlTitlesData(show: false),
       borderData: FlBorderData(
           show: false,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
