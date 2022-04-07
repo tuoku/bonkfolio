@@ -13,7 +13,7 @@ class BonkAPIRepo {
 
   static const _bonkApiBaseUrl = "https://bonkapi.herokuapp.com";
 
-  Future<Map<String, BigInt>> getTokenBalances(
+  Future<Map<String, BigInt>> getTokenBalances(String platform,
       List<String> contractAddresses, String holderAddress) async {
     try {
       for (var e in contractAddresses) {
@@ -22,7 +22,7 @@ class BonkAPIRepo {
       String contracts = contractAddresses.join(',');
       Map<String, BigInt> map = {};
       http.Response res = await http.get(Uri.parse(
-          "$_bonkApiBaseUrl/tokens/balances/$contracts/$holderAddress"));
+          "$_bonkApiBaseUrl/tokens/$platform/balances/$contracts/$holderAddress"));
       final json = jsonDecode(res.body) as List<dynamic>;
       for (var e in json) {
         map[(e["contract"] ?? "")] =
