@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:bonkfolio/misc/global_keys.dart';
@@ -5,8 +8,10 @@ import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:bonkfolio/views/portfolio_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 Future main() async {
+  await Executor().warmUp(log: kDebugMode, isolatesCount: kIsWeb ? 1 : (Platform.numberOfProcessors / 2).floor());
   await dotenv.load(fileName: ".env");
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

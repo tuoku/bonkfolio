@@ -10,6 +10,7 @@ import 'package:bonkfolio/models/pricepoint.dart';
 import 'package:bonkfolio/repositories/bonkapi_repo.dart';
 import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/repositories/database_repo.dart';
+import 'package:worker_manager/worker_manager.dart';
 
 class XScanRepo {
   static final XScanRepo _bscScanRepo = XScanRepo._internal();
@@ -329,15 +330,15 @@ class XScanRepo {
     List<double> weights = [];
     // fix: only buys
     final buys = txs.where((tx) => tx.action == "BUY").toList();
-    List<Future<double>> buyFutures = [];
+    List<Cancelable<double>> buyFutures = [];
     for (var tx in buys) {
       Map map = {};
       map['time'] = tx.time;
       map['chart'] = chart;
-      buyFutures.add(compute(findBuyPrice, map));
+      buyFutures.add(Executor().execute(arg1: map, fun1: findBuyPrice));
     }
 
-    List<double> fbs = await Future.wait(buyFutures);
+    List<double> fbs = (await Cancelable.mergeAll(buyFutures)).toList();
     buyPrices.addAll(fbs);
 
     final totalBought = txs.fold(
@@ -358,7 +359,8 @@ class XScanRepo {
   }
 }
 
-Future<double> findBuyPrice(map) async {
+double findBuyPrice(map) {
+  try {
   final time = map['time'];
   final chart = map['chart'];
   if (chart != null) {
@@ -378,6 +380,10 @@ Future<double> findBuyPrice(map) async {
                         : previousValue)))
         .price;
   } else {
+    return 0;
+  }
+  } catch (e) {
+    if (kDebugMode) print(e);
     return 0;
   }
 }
