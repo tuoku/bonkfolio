@@ -1,4 +1,4 @@
-import 'package:mycryptos/models/pricepoint.dart';
+import 'package:bonkfolio/models/pricepoint.dart';
 
 class Asset {
   double amountBought;

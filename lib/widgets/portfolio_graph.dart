@@ -1,6 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:mycryptos/models/asset.dart';
+import 'package:bonkfolio/models/asset.dart';
 
 class PortfolioGraph extends StatefulWidget {
   const PortfolioGraph({Key? key, required this.data}) : super(key: key);

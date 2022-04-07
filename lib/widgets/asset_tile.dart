@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mycryptos/models/asset.dart';
-import 'package:mycryptos/models/asset_meta.dart';
-import 'package:mycryptos/models/crypto.dart';
-import 'package:mycryptos/repositories/coingecko_repo.dart';
-import 'package:mycryptos/views/crypto_details_screen.dart';
+import 'package:bonkfolio/models/asset.dart';
+import 'package:bonkfolio/models/asset_meta.dart';
+import 'package:bonkfolio/models/crypto.dart';
+import 'package:bonkfolio/repositories/coingecko_repo.dart';
+import 'package:bonkfolio/views/crypto_details_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class AssetTile extends StatelessWidget {

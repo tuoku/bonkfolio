@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:mycryptos/models/crypto_tx.dart';
-import 'package:mycryptos/models/pricepoint.dart';
+import 'package:bonkfolio/models/crypto_tx.dart';
+import 'package:bonkfolio/models/pricepoint.dart';
 
 class AssetGraph extends StatefulWidget {
   const AssetGraph({Key? key, required this.data, required this.charts})
