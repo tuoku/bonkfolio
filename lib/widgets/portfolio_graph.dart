@@ -37,7 +37,7 @@ class _PortfolioGraphState extends State<PortfolioGraph> {
             child: Padding(
               padding: const EdgeInsets.all(0),
               child: LineChart(
-                 mainData(),
+                mainData(),
               ),
             ),
           ),
@@ -51,7 +51,7 @@ class _PortfolioGraphState extends State<PortfolioGraph> {
       gridData: FlGridData(
         show: false,
       ),
-      
+
       borderData: FlBorderData(
           show: false,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -90,9 +90,10 @@ class _PortfolioGraphState extends State<PortfolioGraph> {
                 */
           ],
           isCurved: true,
-          gradient: LinearGradient(colors: gradientColors.map((color) => color.withOpacity(0.5)).toList(),),
-        
-              
+          gradient: LinearGradient(
+            colors:
+                gradientColors.map((color) => color.withOpacity(0.5)).toList(),
+          ),
           barWidth: 5,
           isStrokeCapRound: true,
           dotData: FlDotData(
@@ -100,12 +101,14 @@ class _PortfolioGraphState extends State<PortfolioGraph> {
           ),
           belowBarData: BarAreaData(
             show: true,
-            gradient: LinearGradient(colors:gradientColors.map((color) => color.withOpacity(0.05)).toList(), ),
-            
+            gradient: LinearGradient(
+              colors: gradientColors
+                  .map((color) => color.withOpacity(0.05))
+                  .toList(),
+            ),
           ),
         ),
       ],
     );
   }
-
 }

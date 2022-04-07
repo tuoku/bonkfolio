@@ -147,9 +147,10 @@ class _AssetGraphState extends State<AssetGraph> {
                   reducedChart[index].time.millisecondsSinceEpoch.toDouble(),
                   reducedChart[index].price)),
           isCurved: true,
-          gradient: LinearGradient(colors: gradientColors.map((color) => color.withOpacity(1.0)).toList(),),
-          
-              
+          gradient: LinearGradient(
+            colors:
+                gradientColors.map((color) => color.withOpacity(1.0)).toList(),
+          ),
           barWidth: 5,
           isStrokeCapRound: true,
           dotData: FlDotData(
@@ -157,9 +158,11 @@ class _AssetGraphState extends State<AssetGraph> {
           ),
           belowBarData: BarAreaData(
             show: true,
-            gradient: LinearGradient(colors:  gradientColors.map((color) => color.withOpacity(0.2)).toList(),),
-            
-               
+            gradient: LinearGradient(
+              colors: gradientColors
+                  .map((color) => color.withOpacity(0.2))
+                  .toList(),
+            ),
           ),
         ),
         LineChartBarData(

@@ -15,6 +15,13 @@ class BonkAPIRepo {
 
   Future<Map<String, BigInt>> getTokenBalances(String platform,
       List<String> contractAddresses, String holderAddress) async {
+    if (contractAddresses.isEmpty ||
+        holderAddress.isEmpty ||
+        platform.isEmpty) {
+      Map<String, BigInt> map = {};
+      map[""] = BigInt.zero;
+      return map;
+    }
     try {
       for (var e in contractAddresses) {
         e.toLowerCase();
