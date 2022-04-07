@@ -47,6 +47,7 @@ dependencies:
   shimmer: ^2.0.0
   flutter_dotenv: ^5.0.2
   mobile_scanner: ^1.0.0
+  worker_manager: ^4.2.6
 
 dev_dependencies:
   flutter_test:
