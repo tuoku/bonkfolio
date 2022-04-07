@@ -180,6 +180,7 @@ class _AssetGraphState extends State<AssetGraph> {
 }
 
 Future<List<FlSpot>> calcSpots(map) async {
+  try {
   final data = map['data'];
   final charts = map['charts'];
   return List.generate(
@@ -207,4 +208,8 @@ Future<List<FlSpot>> calcSpots(map) async {
                               ? element.time.millisecondsSinceEpoch.toDouble()
                               : previousValue)))
               .price));
+} catch(e) {
+  if(kDebugMode) print(e);
+  return [];
+}
 }
