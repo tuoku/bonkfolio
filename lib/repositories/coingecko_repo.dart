@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:mycryptos/models/asset_meta.dart';
-import 'package:mycryptos/models/pricepoint.dart';
+import 'package:bonkfolio/models/asset_meta.dart';
+import 'package:bonkfolio/models/pricepoint.dart';
 
 class CoinGeckoRepo {
   static final CoinGeckoRepo _coinGeckoRepo = CoinGeckoRepo._internal();

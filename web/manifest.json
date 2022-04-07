@@ -1,6 +1,6 @@
 {
-    "name": "mycryptos",
-    "short_name": "mycryptos",
+    "name": "bonkfolio",
+    "short_name": "bonkfolio",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

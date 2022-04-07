@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mycryptos/misc/global_keys.dart';
-import 'package:mycryptos/models/wallet.dart';
-import 'package:mycryptos/repositories/database_repo.dart';
-import 'package:mycryptos/views/scan_screen.dart';
+import 'package:bonkfolio/misc/global_keys.dart';
+import 'package:bonkfolio/models/wallet.dart';
+import 'package:bonkfolio/repositories/database_repo.dart';
+import 'package:bonkfolio/views/scan_screen.dart';
 
 class TrackedSourcesScreen extends StatefulWidget {
   const TrackedSourcesScreen({Key? key}) : super(key: key);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:mycryptos/misc/global_keys.dart';
-import 'package:mycryptos/repositories/coingecko_repo.dart';
-import 'package:mycryptos/repositories/database_repo.dart';
-import 'package:mycryptos/views/portfolio_screen.dart';
+import 'package:bonkfolio/misc/global_keys.dart';
+import 'package:bonkfolio/repositories/coingecko_repo.dart';
+import 'package:bonkfolio/repositories/database_repo.dart';
+import 'package:bonkfolio/views/portfolio_screen.dart';
 import 'package:flutter/services.dart';
 
 Future main() async {

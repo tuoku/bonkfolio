@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:mycryptos/models/asset.dart';
-import 'package:mycryptos/models/crypto.dart';
-import 'package:mycryptos/models/wallet.dart';
-import 'package:mycryptos/repositories/xscan_repo.dart';
-import 'package:mycryptos/repositories/coingecko_repo.dart';
-import 'package:mycryptos/repositories/database_repo.dart';
-import 'package:mycryptos/views/tracked_sources_screen.dart';
-import 'package:mycryptos/widgets/asset_tile.dart';
-import 'package:mycryptos/widgets/asset_tile_shimmer.dart';
+import 'package:bonkfolio/models/asset.dart';
+import 'package:bonkfolio/models/crypto.dart';
+import 'package:bonkfolio/models/wallet.dart';
+import 'package:bonkfolio/repositories/xscan_repo.dart';
+import 'package:bonkfolio/repositories/coingecko_repo.dart';
+import 'package:bonkfolio/repositories/database_repo.dart';
+import 'package:bonkfolio/views/tracked_sources_screen.dart';
+import 'package:bonkfolio/widgets/asset_tile.dart';
+import 'package:bonkfolio/widgets/asset_tile_shimmer.dart';
 import 'dart:io' show Platform;
 
 class PortfolioScreen extends StatefulWidget {

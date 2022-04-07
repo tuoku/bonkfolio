@@ -4,12 +4,12 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:mycryptos/models/crypto.dart';
-import 'package:mycryptos/models/crypto_tx.dart';
-import 'package:mycryptos/models/pricepoint.dart';
-import 'package:mycryptos/repositories/bonkapi_repo.dart';
-import 'package:mycryptos/repositories/coingecko_repo.dart';
-import 'package:mycryptos/repositories/database_repo.dart';
+import 'package:bonkfolio/models/crypto.dart';
+import 'package:bonkfolio/models/crypto_tx.dart';
+import 'package:bonkfolio/models/pricepoint.dart';
+import 'package:bonkfolio/repositories/bonkapi_repo.dart';
+import 'package:bonkfolio/repositories/coingecko_repo.dart';
+import 'package:bonkfolio/repositories/database_repo.dart';
 
 class XScanRepo {
   static final XScanRepo _bscScanRepo = XScanRepo._internal();
