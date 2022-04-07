@@ -211,7 +211,7 @@ packages:
       name: pie_chart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.0"
+    version: "5.3.0"
   provider:
     dependency: transitive
     description:
@@ -258,7 +258,7 @@ packages:
       name: sqflite_common
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.0"
+    version: "2.2.1"
   stack_trace:
     dependency: transitive
     description:
@@ -286,7 +286,7 @@ packages:
       name: synchronized
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.0"
+    version: "3.0.0+2"
   term_glyph:
     dependency: transitive
     description:
@@ -316,5 +316,5 @@ packages:
     source: hosted
     version: "2.1.1"
 sdks:
-  dart: ">=2.15.0 <3.0.0"
+  dart: ">=2.16.0 <3.0.0"
   flutter: ">=1.22.0"
