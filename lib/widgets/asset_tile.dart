@@ -33,6 +33,7 @@ class AssetTile extends StatelessWidget {
                   MaterialPageRoute<void>(
                     builder: (BuildContext context) => AssetDetailsScreen(
                       asset: asset,
+                      pValue: pvalue,
                     ),
                   ),
                 );
