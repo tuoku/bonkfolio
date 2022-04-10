@@ -38,19 +38,6 @@ class XScanRepo {
 
   static const ms = Duration(milliseconds: 1);
 
-/*
-  // for bep20 tokens
-  Future<double> getTokenBalance(
-      String address, String contractAddress, int decimals) async {
-    http.Response res = await http.get(Uri.parse(
-        ('$_baseUrl?module=account&action=tokenbalance&contractaddress=$contractAddress&address=$address&tag=latest&apikey=$_apiKey')
-            .replaceAll(' ', '')));
-    print(res.statusCode);
-    var d = double.parse(jsonDecode(res.body)['result']);
-
-    return d / pow(10.0, decimals);
-  }
-*/
   Future<List<CryptoTX>?> getTXs(String address) async {
     List<CryptoTX> allTXs = [];
     List<Future> toFetch = [];
@@ -155,7 +142,7 @@ class XScanRepo {
     return null;
   }
 
-  /// Returns a list of crypto assets found in wallet [addresses].
+  /// Returns a list of crypto assets found in wallets.
   Future<List<Crypto>> getAssets(List<String> addresses) async {
     final futures = <Future>[];
     for (var address in addresses) {
@@ -209,15 +196,22 @@ class XScanRepo {
     }
 
     final List<Future> balanceFs = [];
-    balanceFs.add(
-        getRealBalances("binance-smart-chain", bscBalancesToGet, addresses[0]));
-    balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, addresses[0]));
-    balanceFs
-        .add(getRealBalances("avalanche", avaxBalancesToGet, addresses[0]));
+    for (var a in addresses) {
+      balanceFs
+          .add(getRealBalances("binance-smart-chain", bscBalancesToGet, a));
+      balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, a));
+      balanceFs.add(getRealBalances("avalanche", avaxBalancesToGet, a));
+    }
 
     final balances = await Future.wait(balanceFs);
-    for (var f in balances) {
-      balanceCache.addAll(f);
+    for (Map<String, BigInt> balanceList in balances) {
+      for (MapEntry<String, BigInt> entry in balanceList.entries) {
+        if (balanceCache.containsKey(entry.key)) {
+          balanceCache.update(entry.key, (value) => value += entry.value);
+        } else {
+          balanceCache[entry.key] = entry.value;
+        }
+      }
     }
 
     for (var t in toBuild) {
@@ -361,27 +355,27 @@ class XScanRepo {
 
 double findBuyPrice(map) {
   try {
-  final time = map['time'];
-  final chart = map['chart'];
-  if (chart != null) {
-    return chart
-        .firstWhere((e) =>
-            e.time.millisecondsSinceEpoch.toDouble() ==
-            (chart.fold(
-                chart[0].time.millisecondsSinceEpoch.toDouble(),
-                (previousValue, element) =>
-                    (element.time.millisecondsSinceEpoch.toDouble() -
-                                    time.millisecondsSinceEpoch.toDouble())
-                                .abs() <
-                            ((previousValue as double) -
-                                    time.millisecondsSinceEpoch.toDouble())
-                                .abs()
-                        ? element.time.millisecondsSinceEpoch.toDouble()
-                        : previousValue)))
-        .price;
-  } else {
-    return 0;
-  }
+    final time = map['time'];
+    final chart = map['chart'];
+    if (chart != null) {
+      return chart
+          .firstWhere((e) =>
+              e.time.millisecondsSinceEpoch.toDouble() ==
+              (chart.fold(
+                  chart[0].time.millisecondsSinceEpoch.toDouble(),
+                  (previousValue, element) =>
+                      (element.time.millisecondsSinceEpoch.toDouble() -
+                                      time.millisecondsSinceEpoch.toDouble())
+                                  .abs() <
+                              ((previousValue as double) -
+                                      time.millisecondsSinceEpoch.toDouble())
+                                  .abs()
+                          ? element.time.millisecondsSinceEpoch.toDouble()
+                          : previousValue)))
+          .price;
+    } else {
+      return 0;
+    }
   } catch (e) {
     if (kDebugMode) print(e);
     return 0;

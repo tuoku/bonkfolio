@@ -181,35 +181,35 @@ class _AssetGraphState extends State<AssetGraph> {
 
 Future<List<FlSpot>> calcSpots(map) async {
   try {
-  final data = map['data'];
-  final charts = map['charts'];
-  return List.generate(
-      data.length,
-      (i) => FlSpot(
-          data[i].time.millisecondsSinceEpoch.toDouble(),
-          charts
-              .firstWhere((e) =>
-                  e.time.millisecondsSinceEpoch.toDouble() ==
-                  (charts.fold(
-                      charts[0].time.millisecondsSinceEpoch.toDouble(),
-                      (previousValue, element) =>
-                          (element.time.millisecondsSinceEpoch.toDouble() -
-                                          data[i]
-                                              .time
-                                              .millisecondsSinceEpoch
-                                              .toDouble())
-                                      .abs() <
-                                  ((previousValue as double) -
-                                          data[i]
-                                              .time
-                                              .millisecondsSinceEpoch
-                                              .toDouble())
-                                      .abs()
-                              ? element.time.millisecondsSinceEpoch.toDouble()
-                              : previousValue)))
-              .price));
-} catch(e) {
-  if(kDebugMode) print(e);
-  return [];
-}
+    final data = map['data'];
+    final charts = map['charts'];
+    return List.generate(
+        data.length,
+        (i) => FlSpot(
+            data[i].time.millisecondsSinceEpoch.toDouble(),
+            charts
+                .firstWhere((e) =>
+                    e.time.millisecondsSinceEpoch.toDouble() ==
+                    (charts.fold(
+                        charts[0].time.millisecondsSinceEpoch.toDouble(),
+                        (previousValue, element) =>
+                            (element.time.millisecondsSinceEpoch.toDouble() -
+                                            data[i]
+                                                .time
+                                                .millisecondsSinceEpoch
+                                                .toDouble())
+                                        .abs() <
+                                    ((previousValue as double) -
+                                            data[i]
+                                                .time
+                                                .millisecondsSinceEpoch
+                                                .toDouble())
+                                        .abs()
+                                ? element.time.millisecondsSinceEpoch.toDouble()
+                                : previousValue)))
+                .price));
+  } catch (e) {
+    if (kDebugMode) print(e);
+    return [];
+  }
 }
