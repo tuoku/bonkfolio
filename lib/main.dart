@@ -8,11 +8,20 @@ import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:bonkfolio/views/portfolio_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 Future main() async {
-  await Executor().warmUp(log: kDebugMode, isolatesCount: kIsWeb ? 1 : (Platform.numberOfProcessors / 2).floor());
+  await Executor().warmUp(
+      log: kDebugMode,
+      isolatesCount: kIsWeb ? 1 : (Platform.numberOfProcessors / 2).floor());
   await dotenv.load(fileName: ".env");
+  if (Platform.isWindows || Platform.isLinux) {
+    // Initialize FFI
+    sqfliteFfiInit();
+  }
+
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -22,7 +31,7 @@ Future main() async {
       runApp(const MyApp());
     });
 
-    CoinGeckoRepo().refreshLookupTable();
+    // CoinGeckoRepo().refreshLookupTable();
   });
 }
 

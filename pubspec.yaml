@@ -48,6 +48,8 @@ dependencies:
   flutter_dotenv: ^5.0.2
   mobile_scanner: ^1.0.0
   worker_manager: ^4.2.6
+  sqflite_common_ffi: ^2.1.0+2
+  sqlite3_flutter_libs: ^0.5.5
 
 dev_dependencies:
   flutter_test:
