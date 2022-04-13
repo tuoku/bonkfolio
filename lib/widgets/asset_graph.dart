@@ -114,8 +114,8 @@ class _AssetGraphState extends State<AssetGraph> {
   LineChartData mainData() {
     return LineChartData(
       lineTouchData: LineTouchData(
-          handleBuiltInTouches: false,
-          enabled: false,
+          handleBuiltInTouches: true,
+          enabled: true,
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (touchedSpots) {
               List<LineTooltipItem> items = [];
