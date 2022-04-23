@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:bonkfolio/misc/global_keys.dart';
-import 'package:bonkfolio/models/wallet.dart';
+// import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:bonkfolio/views/scan_screen.dart';
+
+import '../models/database.dart';
 
 class TrackedSourcesScreen extends StatefulWidget {
   const TrackedSourcesScreen({Key? key}) : super(key: key);
@@ -58,11 +60,11 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
                     onPressed: () async {
                       DatabaseRepo()
                           .insertWallet(
-                              Wallet(address: qrController.text, name: ""))
+                              Wallet(id: 0, address: qrController.text, name: ""))
                           .then((v) => GlobalKeys.portfolioKey.currentState!
                               .initState());
                       wallets.insert(walletCount,
-                          Wallet(address: qrController.text, name: ""));
+                          Wallet(id: 0,address: qrController.text, name: ""));
                       walletCount++;
                       listKey.currentState!.insertItem(walletCount - 1,
                           duration: const Duration(milliseconds: 500));

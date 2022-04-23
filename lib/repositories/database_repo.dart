@@ -1,7 +1,12 @@
+import 'package:bonkfolio/models/database.dart';
+import 'package:drift/drift.dart';
 import 'package:flutter/widgets.dart';
-import 'package:bonkfolio/models/wallet.dart';
-import 'package:sqflite/sqflite.dart';
+//import 'package:bonkfolio/models/wallet.dart';
 import 'package:path/path.dart';
+import 'dart:io';
+import 'package:drift/native.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class DatabaseRepo {
   static final DatabaseRepo _databaseRepo = DatabaseRepo._internal();
@@ -12,10 +17,11 @@ class DatabaseRepo {
 
   DatabaseRepo._internal();
 
-  Database? database;
+  final Database db = constructDb(logStatements: true);
   List<Wallet> walletCache = [];
 
   Future<void> init() async {
+    /*
     // Avoid errors caused by flutter upgrade.
 // Importing 'package:flutter/widgets.dart' is required.
     WidgetsFlutterBinding.ensureInitialized();
@@ -36,36 +42,21 @@ class DatabaseRepo {
       // path to perform database upgrades and downgrades.
       version: 1,
     );
+    */
   }
 
   Future<void> insertWallet(Wallet wallet) async {
-    final db = database;
-
-    await db?.insert(
-      'wallets',
-      wallet.toMap(),
-    );
+    await db.createWallet(WalletsCompanion(
+        id: Value(wallet.id),
+        address: Value(wallet.address),
+        name: Value(wallet.name)));
   }
 
   Future<List<Wallet>> getWallets() async {
-    final db = database;
-
-    final List<Map<String, dynamic>> maps = await db!.query('wallets');
-
-    final ls = List.generate(maps.length, (i) {
-      return Wallet(address: maps[i]['address'], name: maps[i]['name']);
-    });
-    walletCache = ls;
-    return ls;
+    return await db.getWallets();
   }
 
   Future<void> deleteWallet(String address) async {
-    final db = database;
-
-    await db?.delete(
-      'wallets',
-      where: 'address = ?',
-      whereArgs: [address],
-    );
+    await db.deleteWallet(walletCache.where((element) => element.address == address).first);
   }
 }
