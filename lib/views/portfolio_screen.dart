@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
 import 'package:bonkfolio/models/crypto.dart';
-import 'package:bonkfolio/models/wallet.dart';
+//import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/repositories/xscan_repo.dart';
 import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/repositories/database_repo.dart';
@@ -12,6 +12,8 @@ import 'package:bonkfolio/views/tracked_sources_screen.dart';
 import 'package:bonkfolio/widgets/asset_tile.dart';
 import 'package:bonkfolio/widgets/asset_tile_shimmer.dart';
 import 'dart:io' show Platform;
+
+import '../models/database.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({Key? key, required this.title}) : super(key: key);
@@ -136,7 +138,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   void initState() {
     super.initState();
     updateWallets();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       updateWallets();
     });
   }
@@ -147,7 +149,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         drawer: _drawer(),
         body: CustomScrollView(
             cacheExtent: 3500,
-            physics: (Platform.isIOS
+            physics: (kIsWeb ? AlwaysScrollableScrollPhysics() : Platform.isIOS
                 ? const AlwaysScrollableScrollPhysics()
                 : const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics())),
@@ -279,7 +281,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Widget _assetList() {
     if (!isReloading) {
       if (assets.isEmpty) {
-        WidgetsBinding.instance!.addPostFrameCallback((timestamp) {
+        WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
           reload();
         });
         return const SliverFillRemaining(child: SizedBox());

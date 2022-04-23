@@ -122,7 +122,7 @@ class _AssetGraphState extends State<AssetGraph> {
               for (var spot in touchedSpots) {
                 var date = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
                 items.add(LineTooltipItem(
-                    "${date.day}/${date.month}/${date.year}", TextStyle()));
+                    "${date.day}/${date.month}/${date.year}", const TextStyle()));
                         
                     
               }

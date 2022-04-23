@@ -32,7 +32,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       enableGraph();
     });
   }
@@ -72,7 +72,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: 50,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     gradient: 
                     LinearGradient(
                       colors: [Colors.black, Colors.transparent],
