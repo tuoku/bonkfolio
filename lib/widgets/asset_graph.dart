@@ -120,10 +120,11 @@ class _AssetGraphState extends State<AssetGraph> {
             getTooltipItems: (touchedSpots) {
               List<LineTooltipItem> items = [];
               for (var spot in touchedSpots) {
+                var date = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
                 items.add(LineTooltipItem(
-                    DateTime.fromMillisecondsSinceEpoch(spot.x.toInt())
-                        .toString(),
-                    const TextStyle()));
+                    "${date.day}/${date.month}/${date.year}", TextStyle()));
+                        
+                    
               }
               return items;
             },
@@ -131,7 +132,15 @@ class _AssetGraphState extends State<AssetGraph> {
       gridData: FlGridData(
         show: false,
       ),
-      titlesData: FlTitlesData(show: false),
+      titlesData: FlTitlesData(
+        show: false,
+        bottomTitles: AxisTitles(
+          drawBehindEverything: false,
+          sideTitles: SideTitles(getTitlesWidget: ((value, meta) {
+            return Text(meta.formattedValue.substring(0,5));
+          }))
+        )
+        ),
       borderData: FlBorderData(
           show: false,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -169,8 +178,12 @@ class _AssetGraphState extends State<AssetGraph> {
           spots: spotss,
           isCurved: true,
           barWidth: 1,
+          color: Colors.transparent,
           isStrokeCapRound: true,
           dotData: FlDotData(
+            getDotPainter: (p0, p1, p2, p3) {
+             return FlDotCirclePainter(color: Colors.red);
+            },
             show: true,
           ),
         ),
