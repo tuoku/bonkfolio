@@ -66,7 +66,21 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
             expandedHeight: 350,
             flexibleSpace: FlexibleSpaceBar(
               stretchModes: const [StretchMode.zoomBackground],
-              background: InteractiveViewer(child: graph),
+              background: Stack(children: [
+              graph,
+              Positioned(
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    gradient: 
+                    LinearGradient(
+                      colors: [Colors.black, Colors.transparent],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter)), ),
+              bottom: 0, )
+              ],
+              ),
             ),
           ),
           SliverList(

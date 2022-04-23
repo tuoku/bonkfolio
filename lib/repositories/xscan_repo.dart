@@ -267,7 +267,7 @@ class XScanRepo {
       final daysSinceFirstTx =
           DateTime.now().difference(txss.first.time).inDays;
       final charts = await CoinGeckoRepo().getChartsByContract(
-          tx.contractAddress, tx.platform, daysSinceFirstTx + 1);
+          tx.contractAddress, tx.platform, daysSinceFirstTx + 15);
       if (charts != null) {
         await CoinGeckoRepo()
             .getInfosByContract(tx.contractAddress, tx.platform);
