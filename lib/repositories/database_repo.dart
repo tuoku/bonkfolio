@@ -1,12 +1,7 @@
 import 'package:bonkfolio/models/database.dart';
+import 'package:bonkfolio/models/database/shared.dart' as shared;
 import 'package:drift/drift.dart';
-import 'package:flutter/widgets.dart';
 //import 'package:bonkfolio/models/wallet.dart';
-import 'package:path/path.dart';
-import 'dart:io';
-import 'package:drift/native.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 class DatabaseRepo {
   static final DatabaseRepo _databaseRepo = DatabaseRepo._internal();
@@ -17,7 +12,7 @@ class DatabaseRepo {
 
   DatabaseRepo._internal();
 
-  final Database db = constructDb(logStatements: true);
+  final Database db = shared.constructDb();
   List<Wallet> walletCache = [];
 
   Future<void> init() async {

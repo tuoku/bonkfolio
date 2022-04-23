@@ -138,7 +138,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   void initState() {
     super.initState();
     updateWallets();
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
       updateWallets();
     });
   }
@@ -149,7 +149,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         drawer: _drawer(),
         body: CustomScrollView(
             cacheExtent: 3500,
-            physics: (Platform.isIOS
+            physics: (kIsWeb ? AlwaysScrollableScrollPhysics() : Platform.isIOS
                 ? const AlwaysScrollableScrollPhysics()
                 : const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics())),
@@ -281,7 +281,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Widget _assetList() {
     if (!isReloading) {
       if (assets.isEmpty) {
-        WidgetsBinding.instance!.addPostFrameCallback((timestamp) {
+        WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
           reload();
         });
         return const SliverFillRemaining(child: SizedBox());
