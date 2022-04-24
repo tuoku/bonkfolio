@@ -66,7 +66,7 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
                       wallets.insert(walletCount,
                           Wallet(id: 0,address: qrController.text, name: ""));
                       walletCount++;
-                      listKey.currentState!.insertItem(walletCount - 1,
+                      listKey.currentState?.insertItem(walletCount - 1,
                           duration: const Duration(milliseconds: 500));
                     },
                     child: const Text("Add"))

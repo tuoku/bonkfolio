@@ -10,4 +10,5 @@ class GlobalKeys {
   GlobalKeys._internal();
 
   static const GlobalKey portfolioKey = GlobalObjectKey('portfolio');
+  
 }
