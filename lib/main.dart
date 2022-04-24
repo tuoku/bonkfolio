@@ -15,7 +15,6 @@ Future main() async {
       log: kDebugMode,
       isolatesCount: kIsWeb ? 1 : (Platform.numberOfProcessors / 2).floor());
   await dotenv.load(fileName: ".env");
-  
 
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -36,18 +35,43 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.black,
-        canvasColor: Colors.black,
-        cardColor: Colors.black,
-        appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
-      ),
-      home: const PortfolioScreen(
-        title: 'Bonkfolio',
-        key: GlobalKeys.portfolioKey,
-      ),
-    );
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          brightness: Brightness.dark,
+          scaffoldBackgroundColor: Colors.black,
+          canvasColor: Colors.black,
+          cardColor: Colors.black,
+          appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+        ),
+        home: LayoutBuilder(
+          builder: ((context, constraints) {
+            bool useVerticalLayout = constraints.maxWidth < 400.0;
+
+            return StatefulBuilder(
+              builder: (BuildContext context, setState) {
+                return useVerticalLayout
+                    ? PortfolioScreen(
+                        title: 'Bonkfolio',
+                        key: GlobalKeys.portfolioKey,
+                      )
+                    : Row(
+                        children: [
+                          Flexible(
+                              flex: 7,
+                              child: PortfolioScreen(
+                                title: 'Bonkfolio',
+                                key: GlobalKeys.portfolioKey,
+                              )),
+                          Flexible(
+                              flex: 3,
+                              child: Container(
+                                color: Colors.red,
+                              ))
+                        ],
+                      );
+              },
+            );
+          }),
+        ));
   }
 }

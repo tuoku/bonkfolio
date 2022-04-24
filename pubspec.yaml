@@ -54,6 +54,7 @@ dependencies:
   path: ^1.8.0
   undo: ^1.4.0
   web_ffi: ^0.7.2
+  equatable: ^2.0.3
 
 dev_dependencies:
   drift_dev: ^1.5.2

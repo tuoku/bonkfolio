@@ -2,6 +2,6 @@ import 'package:drift/web.dart';
 
 import '../database.dart';
 
-Database constructDb({bool logStatements = false}) {
-  return Database(WebDatabase('db', logStatements: logStatements));
+Future<Database> constructDb({bool logStatements = false}) async {
+  return Database(WebDatabase.withStorage(await DriftWebStorage.indexedDbIfSupported('db'), logStatements: logStatements));
 }
