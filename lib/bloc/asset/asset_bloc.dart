@@ -23,7 +23,7 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
     final wallets = event.wallets;
     emit(AssetsLoading());
     try {
-      final assets = await assetRepository.getAssets(wallets);
+      final assets = await assetRepository.getAssets(wallets: wallets);
       double value = 0;
       for (var e in assets) {
         value += (e.amount * e.price);

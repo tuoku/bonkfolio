@@ -8,8 +8,9 @@ class AssetRepository {
 
   final AssetService assetService;
 
-  Future<List<Asset>> getAssets(List<Wallet> wallets) async {
+  Future<List<Asset>> getAssets({required List<Wallet> wallets, bool sort = true}) async {
     final assets = await assetService.getAssets(wallets);
+    if(sort) assets.sort((a, b) => (b.amount * b.price).compareTo((a.amount * a.price)));
     return assets;
   }
 }
