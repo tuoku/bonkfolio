@@ -10,6 +10,7 @@ import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/views/tracked_sources_screen.dart';
 import 'package:bonkfolio/widgets/asset_tile.dart';
 import 'package:bonkfolio/widgets/asset_tile_shimmer.dart';
+import 'package:shimmer/shimmer.dart';
 import 'dart:io' show Platform;
 
 import '../bloc/asset/asset_bloc.dart';
@@ -126,20 +127,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 */
 
-  void changeTimeFrame(String frame) {
-    switch (frame) {
-      case 'day':
-        break;
-      case 'week':
-        break;
-      case 'month':
-        break;
-      case 'all':
-        break;
-      default:
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -147,7 +134,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         body: CustomScrollView(
             cacheExtent: 3500,
             physics: (kIsWeb
-                ? AlwaysScrollableScrollPhysics()
+                ? const AlwaysScrollableScrollPhysics()
                 : Platform.isIOS
                     ? const AlwaysScrollableScrollPhysics()
                     : const BouncingScrollPhysics(
@@ -200,7 +187,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 if (state is WalletInitial) {
                   context.read<WalletBloc>().add(WalletsRequested());
                 }
-                
+
                 if (state is WalletsLoaded) {
                   return _assetList();
                 }
@@ -209,9 +196,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   return _addWalletsPrompt();
                 }
 
-                return const SliverFillRemaining(child: Center(child:Text("Wallets empty")));
+                return const SliverFillRemaining(
+                    child: Center(child: Text("Wallets empty")));
               }), listener: (context, state) {
-               print("WalletState: $state");
+                print("WalletState: $state");
                 if (state is WalletsEmpty || state is WalletInitial) {
                   context.read<WalletBloc>().add(WalletsRequested());
                 }
@@ -265,12 +253,33 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           height: 50,
         ),
         const Text('Total portfolio value'),
-        Text(
-          '\$' + portfolioValue.toStringAsFixed(2),
-          style: const TextStyle(
-            fontSize: 38,
-          ),
-        ),
+        BlocConsumer<AssetBloc, AssetState>(
+            builder: ((context, state) {
+              if (state is AssetsLoaded) {
+                return Text(
+                  '\$' + state.portfolioValue.toStringAsFixed(2),
+                  style: const TextStyle(
+                    fontSize: 38,
+                  ),
+                );
+              }
+              if (state is AssetsLoading) {
+                return Shimmer.fromColors(
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.all(10),
+                      width: 150,
+                      height: 40,
+                      decoration: BoxDecoration(
+                          color: Colors.grey,
+                          borderRadius: BorderRadius.circular(16)),
+                    ),
+                    baseColor: Colors.grey.shade700,
+                    highlightColor: Colors.grey.shade400);
+              }
+              return SizedBox();
+            }),
+            listener: (context, state) {}),
         const SizedBox(
           height: 30,
         ),
@@ -319,7 +328,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               wallets:
                   (context.read<WalletBloc>().state as WalletsLoaded).wallets));
         }
-        
+
         if (state is AssetsLoaded) {
           return SliverList(
             delegate:

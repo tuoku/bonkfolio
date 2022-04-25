@@ -22,6 +22,7 @@ class AssetService {
   static const _bscScanBaseUrl = 'https://api.bscscan.com/api';
   static const _etherScanBaseUrl = "https://api.etherscan.io/api";
   static const _snowTraceBaseUrl = 'https://api.snowtrace.io/api';
+  static const _bonkApiBaseUrl = "https://bonkapi.herokuapp.com";
 
   List<CryptoTX> txCache = [];
   List<String> ignoredContracts = [];
@@ -342,6 +343,36 @@ class AssetService {
     final end = DateTime.now().millisecondsSinceEpoch;
     if (kDebugMode) print("avgBuyPrice took ${end - start}ms");
     return total;
+  }
+
+  Future<Map<String, BigInt>> getTokenBalances(String platform,
+      List<String> contractAddresses, String holderAddress) async {
+    if (contractAddresses.isEmpty ||
+        holderAddress.isEmpty ||
+        platform.isEmpty) {
+      Map<String, BigInt> map = {};
+      map[""] = BigInt.zero;
+      return map;
+    }
+    try {
+      for (var e in contractAddresses) {
+        e.toLowerCase();
+      }
+      String contracts = contractAddresses.join(',');
+      Map<String, BigInt> map = {};
+      http.Response res = await http.get(Uri.parse(
+          "$_bonkApiBaseUrl/tokens/$platform/balances/$contracts/$holderAddress"));
+      final json = jsonDecode(res.body) as List<dynamic>;
+      for (var e in json) {
+        map[(e["contract"] ?? "")] =
+            BigInt.parse((e["balance"] ?? "0")); // change type to BigInt
+      }
+      return map;
+    } catch (e) {
+      Map<String, BigInt> map = {};
+      map[contractAddresses[0]] = BigInt.zero;
+      return map;
+    }
   }
 }
 

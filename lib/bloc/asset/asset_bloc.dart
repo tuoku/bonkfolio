@@ -24,7 +24,11 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
     emit(AssetsLoading());
     try {
       final assets = await assetRepository.getAssets(wallets);
-      emit(AssetsLoaded(assets: assets));
+      double value = 0;
+      for (var e in assets) {
+        value += (e.amount * e.price);
+      }
+      emit(AssetsLoaded(assets: assets, portfolioValue: value));
     } catch (e) {
       if (kDebugMode) print(e);
       emit(AssetsError(error: e is AssetError ? e : AssetError()));

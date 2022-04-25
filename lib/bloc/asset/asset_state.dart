@@ -14,10 +14,11 @@ class AssetsEmpty extends AssetState {}
 
 class AssetsLoaded extends AssetState{
   final List<Asset> assets;
-  AssetsLoaded({required this.assets});
+  final double portfolioValue;
+  AssetsLoaded({required this.assets, required this.portfolioValue});
 
   @override
-  List<Object> get props => [assets];
+  List<Object> get props => [assets, portfolioValue];
 
 }
 
