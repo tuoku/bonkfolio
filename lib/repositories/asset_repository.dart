@@ -1,16 +1,15 @@
-import 'package:bonkfolio/repositories/xscan_repo.dart';
-import 'package:bonkfolio/services/xscan_service.dart';
+import 'package:bonkfolio/services/asset_service.dart';
 
 import '../models/asset.dart';
 import '../models/database.dart';
 
 class AssetRepository {
-  AssetRepository({required this.xScanService});
+  AssetRepository({required this.assetService});
 
-  final XScanService xScanService;
+  final AssetService assetService;
 
   Future<List<Asset>> getAssets(List<Wallet> wallets) async {
-    final assets = await xScanService.getAssets(wallets.map((e) => e.address).toList());
+    final assets = await assetService.getAssets(wallets);
     return assets;
   }
 }

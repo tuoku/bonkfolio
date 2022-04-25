@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
 import 'package:bonkfolio/models/crypto.dart';
 import 'package:bonkfolio/models/crypto_tx.dart';
-import 'package:bonkfolio/repositories/xscan_repo.dart';
+
 import 'package:bonkfolio/widgets/asset_graph.dart';
 import 'package:pie_chart/pie_chart.dart';
 
@@ -33,12 +33,12 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      enableGraph();
+     // enableGraph();
     });
   }
 
   Widget graph = const Center(child: CircularProgressIndicator());
-
+/*
   void enableGraph() {
     setState(() {
       graph = AssetGraph(
@@ -52,7 +52,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
       );
     });
   }
-
+*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(

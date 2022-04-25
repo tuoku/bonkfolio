@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bonkfolio/misc/global_keys.dart';
 // import 'package:bonkfolio/models/wallet.dart';
-import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:bonkfolio/views/scan_screen.dart';
 
 import '../models/database.dart';
@@ -58,6 +57,7 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
+                      /*
                       DatabaseRepo()
                           .insertWallet(
                               Wallet(id: 0, address: qrController.text, name: ""))
@@ -68,6 +68,7 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
                       walletCount++;
                       listKey.currentState?.insertItem(walletCount - 1,
                           duration: const Duration(milliseconds: 500));
+                          */
                     },
                     child: const Text("Add"))
               ],
@@ -75,7 +76,7 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
             const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16), child: Divider()),
             FutureBuilder<List<Wallet>>(
-              future: DatabaseRepo().getWallets(),
+              future: Future.delayed(Duration(seconds: 2)),//DatabaseRepo().getWallets(),
               builder: (
                 BuildContext context,
                 AsyncSnapshot<List<Wallet>> snapshot,
@@ -103,12 +104,14 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
                                     ),
                                     key: ValueKey(wallets[index].address),
                                     onDismissed: (dismissDirection) {
+                                      /*
                                       DatabaseRepo()
                                           .deleteWallet(wallets[index].address);
                                       wallets.removeAt(index);
                                       walletCount--;
                                       listKey.currentState!.removeItem(index,
                                           (_, animation) => const SizedBox());
+                                    */
                                     },
                                     confirmDismiss: (dismissDirection) async {
                                       return await showDialog(

@@ -9,10 +9,12 @@ import 'package:bonkfolio/models/crypto_tx.dart';
 import 'package:bonkfolio/models/pricepoint.dart';
 import 'package:bonkfolio/repositories/bonkapi_repo.dart';
 import 'package:bonkfolio/repositories/coingecko_repo.dart';
-import 'package:bonkfolio/repositories/database_repo.dart';
+//import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:worker_manager/worker_manager.dart';
 
-class XScanService {
+import '../models/database.dart';
+
+class AssetService {
   final _bscScanApiKey = dotenv.env['BSCSCAN_API_KEY'] ?? "";
   final _etherScanApiKey = dotenv.env['ETHERSCAN_API_KEY'] ?? "";
   final _snowTraceApiKey = dotenv.env['SNOWTRACE_API_KEY'] ?? "";
@@ -30,10 +32,9 @@ class XScanService {
 
   static const ms = Duration(milliseconds: 1);
 
-  Future<List<CryptoTX>?> getTXs(String address) async {
+  Future<List<CryptoTX>?> getTXs(String address, List<Wallet> wallets) async {
     List<CryptoTX> allTXs = [];
     List<Future> toFetch = [];
-    final wallets = await DatabaseRepo().getWallets();
     final addresses = wallets.map((e) => e.address.toLowerCase());
 
     for (var url in [_bscScanBaseUrl, _etherScanBaseUrl, _snowTraceBaseUrl]) {
@@ -97,14 +98,13 @@ class XScanService {
     return allTXs;
   }
 
-  Future<List<CryptoTX>?> getBNBTXs(String address) async {
+  Future<List<CryptoTX>?> getBNBTXs(String address, List<Wallet> wallets) async {
     http.Response res = await http.get(Uri.parse(
         '$_bscScanBaseUrl?module=account&action=txlist&address=$address&startblock=0&endblock=999999999&sort=asc&apikey=$_bscScanApiKey'));
     if (kDebugMode) print(res.statusCode);
     try {
       final txs = jsonDecode(res.body)['result'] as List<dynamic>;
       List<CryptoTX> ls = [];
-      final wallets = await DatabaseRepo().getWallets();
       final addresses = wallets.map((e) => e.address.toLowerCase());
       for (var i = 0; i <= txs.length - 1; i++) {
         if (txs[i]['isError'] == "0") {
@@ -135,10 +135,10 @@ class XScanService {
   }
 
   /// Returns a list of crypto assets found in wallets.
-  Future<List<Crypto>> getAssets(List<String> addresses) async {
+  Future<List<Crypto>> getAssets(List<Wallet> wallets) async {
     final futures = <Future>[];
-    for (var address in addresses) {
-      futures.add(getTXs(address.toLowerCase()));
+    for (var wallet in wallets) {
+      futures.add(getTXs(wallet.address.toLowerCase(), wallets));
       // futures.add(getBNBTXs(address.toLowerCase()));
     }
 
@@ -188,11 +188,11 @@ class XScanService {
     }
 
     final List<Future> balanceFs = [];
-    for (var a in addresses) {
+    for (var a in wallets) {
       balanceFs
-          .add(getRealBalances("binance-smart-chain", bscBalancesToGet, a));
-      balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, a));
-      balanceFs.add(getRealBalances("avalanche", avaxBalancesToGet, a));
+          .add(getRealBalances("binance-smart-chain", bscBalancesToGet, a.address));
+      balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, a.address));
+      balanceFs.add(getRealBalances("avalanche", avaxBalancesToGet, a.address));
     }
 
     final balances = await Future.wait(balanceFs);

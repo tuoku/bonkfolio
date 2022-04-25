@@ -23,7 +23,7 @@ class AssetsLoaded extends AssetState{
 
 class AssetsError extends AssetState{
 
-  String error;
+  final AssetError error;
 
   AssetsError({required this.error});
 

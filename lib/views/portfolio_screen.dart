@@ -1,18 +1,18 @@
+import 'package:bonkfolio/bloc/wallet/wallet_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
 import 'package:bonkfolio/models/crypto.dart';
-//import 'package:bonkfolio/models/wallet.dart';
-import 'package:bonkfolio/repositories/xscan_repo.dart';
 import 'package:bonkfolio/repositories/coingecko_repo.dart';
-import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:bonkfolio/views/tracked_sources_screen.dart';
 import 'package:bonkfolio/widgets/asset_tile.dart';
 import 'package:bonkfolio/widgets/asset_tile_shimmer.dart';
 import 'dart:io' show Platform;
 
+import '../bloc/asset/asset_bloc.dart';
 import '../models/database.dart';
 
 class PortfolioScreen extends StatefulWidget {
@@ -42,6 +42,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   List<Wallet> wallets = [];
   bool isReloading = false;
 
+/*
   void updateWallets() {
     DatabaseRepo().getWallets().then((value) {
       setState(() {
@@ -49,7 +50,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       });
     });
   }
+*/
 
+/*
   Future reload() async {
     setState(() {
       isReloading = true;
@@ -81,7 +84,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       isReloading = false;
     });
   }
+*/
 
+/*
   Future refresh() async {
     List<String> contracts = [];
     for (var asset in assets.where((e) => e.isSupported)) {
@@ -119,6 +124,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       portfolioValue = v;
     });
   }
+*/
 
   void changeTimeFrame(String frame) {
     switch (frame) {
@@ -135,24 +141,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    updateWallets();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      updateWallets();
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: _drawer(),
         body: CustomScrollView(
             cacheExtent: 3500,
-            physics: (kIsWeb ? AlwaysScrollableScrollPhysics() : Platform.isIOS
-                ? const AlwaysScrollableScrollPhysics()
-                : const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics())),
+            physics: (kIsWeb
+                ? AlwaysScrollableScrollPhysics()
+                : Platform.isIOS
+                    ? const AlwaysScrollableScrollPhysics()
+                    : const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics())),
             slivers: [
               SliverAppBar(
                   centerTitle: true,
@@ -163,7 +162,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   actions: [
                     PopupMenuButton<String>(onSelected: (string) {
                       if (string == "Force reload") {
-                        reload();
+                        //  reload();
                       } else {
                         setState(() {
                           hidezero = !hidezero;
@@ -196,8 +195,27 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               CupertinoSliverRefreshControl(
                   refreshTriggerPullDistance: 150.0,
                   refreshIndicatorExtent: 60.0,
-                  onRefresh: refresh),
-              wallets.isEmpty ? _addWalletsPrompt() : _assetList(),
+                  onRefresh: () => Future.delayed(Duration(seconds: 2))),
+              BlocConsumer<WalletBloc, WalletState>(builder: ((context, state) {
+                if (state is WalletInitial) {
+                  context.read<WalletBloc>().add(WalletsRequested());
+                }
+                
+                if (state is WalletsLoaded) {
+                  return _assetList();
+                }
+
+                if (state is WalletsEmpty) {
+                  return _addWalletsPrompt();
+                }
+
+                return const SliverFillRemaining(child: Center(child:Text("Wallets empty")));
+              }), listener: (context, state) {
+               print("WalletState: $state");
+                if (state is WalletsEmpty || state is WalletInitial) {
+                  context.read<WalletBloc>().add(WalletsRequested());
+                }
+              }),
               const SliverPadding(padding: EdgeInsets.only(bottom: 40))
             ]));
   }
@@ -279,35 +297,42 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   }
 
   Widget _assetList() {
-    if (!isReloading) {
-      if (assets.isEmpty) {
-        WidgetsBinding.instance?.addPostFrameCallback((timestamp) {
-          reload();
-        });
-        return const SliverFillRemaining(child: SizedBox());
-      }
-    }
-    return SliverList(
-      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-        if (!isReloading) {
-          if (hidezero) {
-            if (assets[index].amount * assets[index].price > 1) {
+    return BlocConsumer<AssetBloc, AssetState>(
+      listener: ((context, state) {
+        if (state is AssetInitial || state is AssetsEmpty) {
+          context.read<AssetBloc>().add(AssetsRequested(
+              wallets:
+                  (context.read<WalletBloc>().state as WalletsLoaded).wallets));
+        }
+      }),
+      builder: ((context, state) {
+        if (state is AssetsLoading) {
+          return SliverList(
+              delegate:
+                  SliverChildBuilderDelegate((BuildContext context, int index) {
+            return const AssetTileShimmer();
+          }, childCount: 10));
+        }
+
+        if (state is AssetInitial || state is AssetsEmpty) {
+          context.read<AssetBloc>().add(AssetsRequested(
+              wallets:
+                  (context.read<WalletBloc>().state as WalletsLoaded).wallets));
+        }
+        
+        if (state is AssetsLoaded) {
+          return SliverList(
+            delegate:
+                SliverChildBuilderDelegate((BuildContext context, int index) {
               return AssetTile(
-                asset: assets[index],
+                asset: state.assets[index],
                 pvalue: portfolioValue,
               );
-            }
-          } else {
-            return AssetTile(
-              asset: assets[index],
-              pvalue: portfolioValue,
-            );
-          }
-        } else {
-          return const AssetTileShimmer();
+            }, childCount: state.assets.length),
+          );
         }
-        return null;
-      }, childCount: (assets.isEmpty ? 10 : assets.length)),
+        return const SliverFillRemaining(child: SizedBox());
+      }),
     );
   }
 
