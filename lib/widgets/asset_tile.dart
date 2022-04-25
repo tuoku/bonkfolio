@@ -73,15 +73,10 @@ class AssetTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                         Text(
-                          (((asset.price - avg) /
-                                          ((asset.price + avg) / 2) *
-                                          100) >=
-                                      0
+                          ((((asset.price - avg) / avg) * 100) >= 0
                                   ? '+'
                                   : "") +
-                              ((asset.price - avg) /
-                                      ((asset.price + avg) / 2) *
-                                      100)
+                              (((asset.price - avg) / avg) * 100)
                                   .toStringAsFixed(2) +
                               "%",
                           style: TextStyle(

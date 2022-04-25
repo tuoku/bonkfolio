@@ -49,12 +49,13 @@ class MyApp extends StatelessWidget {
         ],
         child: MultiBlocProvider(
             providers: [
+              BlocProvider<WalletBloc>(
+                  create: (context) => WalletBloc(
+                      walletRepository: context.read<WalletRepository>())..add(WalletsRequested())),
               BlocProvider<AssetBloc>(
                   create: (context) => AssetBloc(
                       assetRepository: context.read<AssetRepository>())),
-              BlocProvider<WalletBloc>(
-                  create: (context) => WalletBloc(
-                      walletRepository: context.read<WalletRepository>()))
+              
             ],
             child: MaterialApp(
                 title: 'Flutter Demo',

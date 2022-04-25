@@ -12,6 +12,7 @@ import 'package:bonkfolio/repositories/coingecko_repo.dart';
 //import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:worker_manager/worker_manager.dart';
 
+import '../models/asset.dart';
 import '../models/database.dart';
 
 class AssetService {
@@ -99,7 +100,8 @@ class AssetService {
     return allTXs;
   }
 
-  Future<List<CryptoTX>?> getBNBTXs(String address, List<Wallet> wallets) async {
+  Future<List<CryptoTX>?> getBNBTXs(
+      String address, List<Wallet> wallets) async {
     http.Response res = await http.get(Uri.parse(
         '$_bscScanBaseUrl?module=account&action=txlist&address=$address&startblock=0&endblock=999999999&sort=asc&apikey=$_bscScanApiKey'));
     if (kDebugMode) print(res.statusCode);
@@ -190,8 +192,8 @@ class AssetService {
 
     final List<Future> balanceFs = [];
     for (var a in wallets) {
-      balanceFs
-          .add(getRealBalances("binance-smart-chain", bscBalancesToGet, a.address));
+      balanceFs.add(
+          getRealBalances("binance-smart-chain", bscBalancesToGet, a.address));
       balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, a.address));
       balanceFs.add(getRealBalances("avalanche", avaxBalancesToGet, a.address));
     }
@@ -373,6 +375,48 @@ class AssetService {
       map[contractAddresses[0]] = BigInt.zero;
       return map;
     }
+  }
+
+  Future<List<Asset>> refreshAssets(List<Asset> toRefresh) async {
+    List<String> contracts = [];
+    for (var asset in toRefresh.where((e) => e.isSupported)) {
+      contracts.add((asset as Crypto).contractAddress);
+    }
+    List<String> cgIds = [];
+    for (var contract in contracts) {
+      try {
+        cgIds.add(
+            CoinGeckoRepo().metas.firstWhere((e) => e.id == contract).cgId);
+      } catch (e) {
+        if (kDebugMode) print(e);
+      }
+    }
+
+    final map = await CoinGeckoRepo().getPricesByIDs(cgIds);
+    final supported =
+        toRefresh.where((element) => element.isSupported).toList();
+    for (var i = 0; i <= supported.length - 1; i++) {
+      Crypto c = (supported[i] as Crypto);
+      c.price = map[CoinGeckoRepo()
+          .metas
+          .firstWhere((element) => element.id == c.contractAddress)
+          .cgId];
+      supported[i] = c;
+    }
+    toRefresh.removeWhere((element) => element.isSupported);
+    toRefresh.addAll(supported);
+    toRefresh
+        .sort((a, b) => (a.amount * a.price).compareTo(b.amount * b.price));
+
+    return toRefresh.reversed.toList();
+  }
+
+  double getPortfolioValue(List<Asset> assets) {
+    double v = 0.0;
+    for (var e in assets) {
+      v += (e.amount * e.price);
+    }
+    return v;
   }
 }
 

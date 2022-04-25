@@ -43,6 +43,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   List<Wallet> wallets = [];
   bool isReloading = false;
 
+
+  @override
+  void initState() {
+   
+         WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
+           context.read<AssetBloc>().add(AssetsRequested(wallets: 
+           await context.read<WalletBloc>().walletRepository.getWallets()));
+          }); 
+        
+    super.initState();
+  }
 /*
   void updateWallets() {
     DatabaseRepo().getWallets().then((value) {
@@ -182,7 +193,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               CupertinoSliverRefreshControl(
                   refreshTriggerPullDistance: 150.0,
                   refreshIndicatorExtent: 60.0,
-                  onRefresh: () => Future.delayed(Duration(seconds: 2))),
+                  onRefresh: () async {
+                    context.read<AssetBloc>().add(AssetRefreshRequested());
+                    await Future.delayed(Duration(milliseconds: 50));
+                    while ( context.read<AssetBloc>().state is AssetsRefreshing) {
+                      await Future.delayed(Duration(milliseconds: 50));
+                    }
+                  }),
               BlocConsumer<WalletBloc, WalletState>(builder: ((context, state) {
                 if (state is WalletInitial) {
                   context.read<WalletBloc>().add(WalletsRequested());
@@ -254,6 +271,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         const Text('Total portfolio value'),
         BlocConsumer<AssetBloc, AssetState>(
+          buildWhen: (previous, current) {
+           return current is! AssetsRefreshing;
+          },
             builder: ((context, state) {
               if (state is AssetsLoaded) {
                 return Text(
@@ -307,12 +327,11 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   Widget _assetList() {
     return BlocConsumer<AssetBloc, AssetState>(
+      buildWhen: (previous, current) {
+           return current is! AssetsRefreshing;
+          },
       listener: ((context, state) {
-        if (state is AssetInitial || state is AssetsEmpty) {
-          context.read<AssetBloc>().add(AssetsRequested(
-              wallets:
-                  (context.read<WalletBloc>().state as WalletsLoaded).wallets));
-        }
+        
       }),
       builder: ((context, state) {
         if (state is AssetsLoading) {
@@ -324,9 +343,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         }
 
         if (state is AssetInitial || state is AssetsEmpty) {
-          context.read<AssetBloc>().add(AssetsRequested(
-              wallets:
-                  (context.read<WalletBloc>().state as WalletsLoaded).wallets));
+         
         }
 
         if (state is AssetsLoaded) {

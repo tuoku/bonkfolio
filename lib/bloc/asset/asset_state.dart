@@ -12,6 +12,8 @@ class AssetsLoading extends AssetState {}
 
 class AssetsEmpty extends AssetState {}
 
+class AssetsRefreshing extends AssetState {}
+
 class AssetsLoaded extends AssetState{
   final List<Asset> assets;
   final double portfolioValue;

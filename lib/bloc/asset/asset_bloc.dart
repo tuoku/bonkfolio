@@ -14,6 +14,7 @@ part 'asset_state.dart';
 class AssetBloc extends Bloc<AssetEvent, AssetState> {
   AssetBloc({required this.assetRepository}) : super(AssetInitial()) {
     on<AssetsRequested>(_onAssetsRequested);
+    on<AssetRefreshRequested>(_onRefreshRequested);
   }
 
   final AssetRepository assetRepository;
@@ -24,14 +25,24 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
     emit(AssetsLoading());
     try {
       final assets = await assetRepository.getAssets(wallets: wallets);
-      double value = 0;
-      for (var e in assets) {
-        value += (e.amount * e.price);
-      }
-      emit(AssetsLoaded(assets: assets, portfolioValue: value));
+
+      emit(AssetsLoaded(
+          assets: assets,
+          portfolioValue: assetRepository.getPortfolioValue(assets)));
     } catch (e) {
       if (kDebugMode) print(e);
       emit(AssetsError(error: e is AssetError ? e : AssetError()));
     }
+  }
+
+  Future<void> _onRefreshRequested(
+      AssetRefreshRequested event, Emitter<AssetState> emit) async {
+        final s = (state as AssetsLoaded);
+        emit(AssetsRefreshing());
+    final refreshed =
+        await assetRepository.refreshAssets(s.assets);
+    emit(AssetsLoaded(
+        assets: refreshed,
+        portfolioValue: assetRepository.getPortfolioValue(refreshed)));
   }
 }
