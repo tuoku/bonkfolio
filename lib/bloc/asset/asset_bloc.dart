@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bloc/bloc.dart';
 import 'package:bonkfolio/repositories/asset_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -45,4 +47,5 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
         assets: refreshed,
         portfolioValue: assetRepository.getPortfolioValue(refreshed)));
   }
+
 }

@@ -7,7 +7,6 @@ export 'database/shared.dart';
 
 part 'database.g.dart';
 
-@DataClassName('Wallet')
 class Wallets extends Table {
   IntColumn get id => integer().autoIncrement()();
 

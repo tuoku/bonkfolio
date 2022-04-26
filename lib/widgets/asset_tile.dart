@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
 import 'package:bonkfolio/models/asset_meta.dart';
@@ -6,6 +8,9 @@ import 'package:bonkfolio/models/crypto.dart';
 import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/views/crypto_details_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../bloc/asset_detail/asset_detail_bloc.dart';
+import '../misc/globals.dart' as globals;
 
 class AssetTile extends StatelessWidget {
   AssetTile({Key? key, required this.asset, required this.pvalue})
@@ -28,15 +33,20 @@ class AssetTile extends StatelessWidget {
             isThreeLine: false,
             onTap: () {
               if (asset.isSupported) {
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (BuildContext context) => AssetDetailsScreen(
-                      asset: asset,
-                      pValue: pvalue,
+                context
+                    .read<AssetDetailBloc>()
+                    .add(AssetSelected(asset: asset));
+                if (globals.useVerticalLayout) {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => AssetDetailsScreen(
+                        asset: asset,
+                        pValue: pvalue,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               } else {
                 Fluttertoast.cancel();
                 Fluttertoast.showToast(
@@ -51,10 +61,10 @@ class AssetTile extends StatelessWidget {
                   .metas
                   .firstWhere(
                       (element) =>
-                          element.id.toLowerCase() ==
+                          element.contract.toLowerCase() ==
                           (asset as Crypto).contractAddress.toLowerCase(),
                       orElse: () => AssetMeta(
-                          id: "",
+                          contract: "",
                           thumbnail: "https://via.placeholder.com/150",
                           cgId: ""))
                   .thumbnail!),

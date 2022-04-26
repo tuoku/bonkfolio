@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bonkfolio/misc/global_keys.dart';
+import 'package:bonkfolio/misc/globals.dart';
 // import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/views/scan_screen.dart';
 

@@ -386,7 +386,7 @@ class AssetService {
     for (var contract in contracts) {
       try {
         cgIds.add(
-            CoinGeckoRepo().metas.firstWhere((e) => e.id == contract).cgId);
+            CoinGeckoRepo().metas.firstWhere((e) => e.contract == contract).cgId);
       } catch (e) {
         if (kDebugMode) print(e);
       }
@@ -399,7 +399,7 @@ class AssetService {
       Crypto c = (supported[i] as Crypto);
       c.price = map[CoinGeckoRepo()
           .metas
-          .firstWhere((element) => element.id == c.contractAddress)
+          .firstWhere((element) => element.contract == c.contractAddress)
           .cgId];
       supported[i] = c;
     }
