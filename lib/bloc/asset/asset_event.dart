@@ -16,3 +16,11 @@ class AssetsRequested extends AssetEvent {
   @override
   String toString() => 'AssetsRequested { wallets: $wallets }';
 }
+
+class AssetRefreshRequested extends AssetEvent {
+  const AssetRefreshRequested();
+   @override
+  List<Object> get props => [];
+  @override
+  String toString() => 'AssetRefreshRequested';
+}

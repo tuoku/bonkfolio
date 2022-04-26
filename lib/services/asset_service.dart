@@ -12,6 +12,7 @@ import 'package:bonkfolio/repositories/coingecko_repo.dart';
 //import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:worker_manager/worker_manager.dart';
 
+import '../models/asset.dart';
 import '../models/database.dart';
 
 class AssetService {
@@ -22,6 +23,7 @@ class AssetService {
   static const _bscScanBaseUrl = 'https://api.bscscan.com/api';
   static const _etherScanBaseUrl = "https://api.etherscan.io/api";
   static const _snowTraceBaseUrl = 'https://api.snowtrace.io/api';
+  static const _bonkApiBaseUrl = "https://bonkapi.herokuapp.com";
 
   List<CryptoTX> txCache = [];
   List<String> ignoredContracts = [];
@@ -98,7 +100,8 @@ class AssetService {
     return allTXs;
   }
 
-  Future<List<CryptoTX>?> getBNBTXs(String address, List<Wallet> wallets) async {
+  Future<List<CryptoTX>?> getBNBTXs(
+      String address, List<Wallet> wallets) async {
     http.Response res = await http.get(Uri.parse(
         '$_bscScanBaseUrl?module=account&action=txlist&address=$address&startblock=0&endblock=999999999&sort=asc&apikey=$_bscScanApiKey'));
     if (kDebugMode) print(res.statusCode);
@@ -189,8 +192,8 @@ class AssetService {
 
     final List<Future> balanceFs = [];
     for (var a in wallets) {
-      balanceFs
-          .add(getRealBalances("binance-smart-chain", bscBalancesToGet, a.address));
+      balanceFs.add(
+          getRealBalances("binance-smart-chain", bscBalancesToGet, a.address));
       balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, a.address));
       balanceFs.add(getRealBalances("avalanche", avaxBalancesToGet, a.address));
     }
@@ -342,6 +345,78 @@ class AssetService {
     final end = DateTime.now().millisecondsSinceEpoch;
     if (kDebugMode) print("avgBuyPrice took ${end - start}ms");
     return total;
+  }
+
+  Future<Map<String, BigInt>> getTokenBalances(String platform,
+      List<String> contractAddresses, String holderAddress) async {
+    if (contractAddresses.isEmpty ||
+        holderAddress.isEmpty ||
+        platform.isEmpty) {
+      Map<String, BigInt> map = {};
+      map[""] = BigInt.zero;
+      return map;
+    }
+    try {
+      for (var e in contractAddresses) {
+        e.toLowerCase();
+      }
+      String contracts = contractAddresses.join(',');
+      Map<String, BigInt> map = {};
+      http.Response res = await http.get(Uri.parse(
+          "$_bonkApiBaseUrl/tokens/$platform/balances/$contracts/$holderAddress"));
+      final json = jsonDecode(res.body) as List<dynamic>;
+      for (var e in json) {
+        map[(e["contract"] ?? "")] =
+            BigInt.parse((e["balance"] ?? "0")); // change type to BigInt
+      }
+      return map;
+    } catch (e) {
+      Map<String, BigInt> map = {};
+      map[contractAddresses[0]] = BigInt.zero;
+      return map;
+    }
+  }
+
+  Future<List<Asset>> refreshAssets(List<Asset> toRefresh) async {
+    List<String> contracts = [];
+    for (var asset in toRefresh.where((e) => e.isSupported)) {
+      contracts.add((asset as Crypto).contractAddress);
+    }
+    List<String> cgIds = [];
+    for (var contract in contracts) {
+      try {
+        cgIds.add(
+            CoinGeckoRepo().metas.firstWhere((e) => e.contract == contract).cgId);
+      } catch (e) {
+        if (kDebugMode) print(e);
+      }
+    }
+
+    final map = await CoinGeckoRepo().getPricesByIDs(cgIds);
+    final supported =
+        toRefresh.where((element) => element.isSupported).toList();
+    for (var i = 0; i <= supported.length - 1; i++) {
+      Crypto c = (supported[i] as Crypto);
+      c.price = map[CoinGeckoRepo()
+          .metas
+          .firstWhere((element) => element.contract == c.contractAddress)
+          .cgId];
+      supported[i] = c;
+    }
+    toRefresh.removeWhere((element) => element.isSupported);
+    toRefresh.addAll(supported);
+    toRefresh
+        .sort((a, b) => (a.amount * a.price).compareTo(b.amount * b.price));
+
+    return toRefresh.reversed.toList();
+  }
+
+  double getPortfolioValue(List<Asset> assets) {
+    double v = 0.0;
+    for (var e in assets) {
+      v += (e.amount * e.price);
+    }
+    return v;
   }
 }
 

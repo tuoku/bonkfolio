@@ -6,15 +6,20 @@ import 'package:bonkfolio/repositories/asset_repository.dart';
 import 'package:bonkfolio/repositories/wallet_repository.dart';
 import 'package:bonkfolio/services/asset_service.dart';
 import 'package:bonkfolio/services/database_service.dart';
+import 'package:bonkfolio/views/crypto_details_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:bonkfolio/misc/global_keys.dart';
+import 'package:bonkfolio/misc/globals.dart';
 import 'package:bonkfolio/views/portfolio_screen.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'package:worker_manager/worker_manager.dart';
+
+import 'bloc/asset_detail/asset_detail_bloc.dart';
+import 'misc/globals.dart' as globals;
 
 Future main() async {
   await Executor().warmUp(
@@ -23,6 +28,7 @@ Future main() async {
   await dotenv.load(fileName: ".env");
 
   WidgetsFlutterBinding.ensureInitialized();
+
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent));
@@ -49,12 +55,15 @@ class MyApp extends StatelessWidget {
         ],
         child: MultiBlocProvider(
             providers: [
+              BlocProvider<WalletBloc>(
+                  create: (context) => WalletBloc(
+                      walletRepository: context.read<WalletRepository>())
+                    ..add(const WalletsRequested())),
               BlocProvider<AssetBloc>(
                   create: (context) => AssetBloc(
                       assetRepository: context.read<AssetRepository>())),
-              BlocProvider<WalletBloc>(
-                  create: (context) => WalletBloc(
-                      walletRepository: context.read<WalletRepository>()))
+              BlocProvider<AssetDetailBloc>(
+                  create: ((context) => AssetDetailBloc()))
             ],
             child: MaterialApp(
                 title: 'Flutter Demo',
@@ -68,13 +77,13 @@ class MyApp extends StatelessWidget {
                 home: LayoutBuilder(
                   builder: ((context, constraints) {
                     bool useVerticalLayout = constraints.maxWidth < 600.0;
-
+                    globals.useVerticalLayout = useVerticalLayout;
                     return StatefulBuilder(
                       builder: (BuildContext context, setState) {
                         return useVerticalLayout
                             ? PortfolioScreen(
                                 title: 'Bonkfolio',
-                                key: GlobalKeys.portfolioKey,
+                                
                               )
                             : Row(
                                 children: [
@@ -82,12 +91,25 @@ class MyApp extends StatelessWidget {
                                       flex: 7,
                                       child: PortfolioScreen(
                                         title: 'Bonkfolio',
-                                        key: GlobalKeys.portfolioKey,
+                                        
                                       )),
                                   Flexible(
-                                      flex: 3,
-                                      child: Container(
-                                        color: Colors.red,
+                                      flex: 7,
+                                      child: BlocConsumer<AssetDetailBloc,
+                                          AssetDetailState>(
+                                        listener: (context, state) {},
+                                        builder: ((context, state) {
+                                          if (state is AssetActive) {
+                                            return AssetDetailsScreen(
+                                                asset: (state as AssetActive)
+                                                    .asset,
+                                                pValue: 0);
+                                          }
+
+                                          return Container(
+                                            color: Colors.red,
+                                          );
+                                        }),
                                       ))
                                 ],
                               );
