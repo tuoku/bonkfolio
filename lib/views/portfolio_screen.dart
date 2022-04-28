@@ -119,7 +119,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                 return const SliverFillRemaining(
                     child: Center(child: Text("Wallets empty")));
               }), listener: (context, state) {
-                print("WalletState: $state");
+                if(kDebugMode)  print("WalletState: $state");
                 if (state is WalletsEmpty || state is WalletInitial) {
                   context.read<WalletBloc>().add(const WalletsRequested());
                 }
