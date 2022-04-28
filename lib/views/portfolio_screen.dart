@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:bonkfolio/models/asset.dart';
-import 'package:bonkfolio/models/crypto.dart';
-import 'package:bonkfolio/repositories/coingecko_repo.dart';
+
 import 'package:bonkfolio/views/tracked_sources_screen.dart';
 import 'package:bonkfolio/widgets/asset_tile.dart';
 import 'package:bonkfolio/widgets/asset_tile_shimmer.dart';
@@ -14,7 +12,7 @@ import 'package:shimmer/shimmer.dart';
 import 'dart:io' show Platform;
 
 import '../bloc/asset/asset_bloc.dart';
-import '../models/database.dart';
+import '../models/wallet.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({Key? key, required this.title}) : super(key: key);

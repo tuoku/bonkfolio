@@ -1,3 +1,5 @@
+import 'database.dart';
+
 class Wallet {
   final String address;
   final String name;
@@ -10,4 +12,6 @@ class Wallet {
       'name': name,
     };
   }
+
+  factory Wallet.fromDb(dbWallet w) => Wallet(address: w.address, name: w.name);
 }

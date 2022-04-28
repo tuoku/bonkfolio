@@ -1,14 +1,11 @@
-import 'dart:convert';
-
 import 'package:bloc/bloc.dart';
 import 'package:bonkfolio/repositories/asset_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 
 import '../../error/asset_error.dart';
 import '../../models/asset.dart';
-import '../../models/database.dart';
+import '../../models/wallet.dart';
 
 part 'asset_event.dart';
 part 'asset_state.dart';

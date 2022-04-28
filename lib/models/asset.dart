@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:bonkfolio/models/pricepoint.dart';
+import 'package:drift/drift.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'asset.g.dart';
 
 class ChartConverter
+    extends TypeConverter<List<PricePoint>?, String>
     implements JsonConverter<List<PricePoint>?, List<Map<String, dynamic>>> {
   const ChartConverter();
 
@@ -35,6 +39,13 @@ class ChartConverter
               'price': object[i].price
             });
   }
+
+  @override
+  List<PricePoint>? mapToDart(String? fromDb) =>
+      fromDb == null ? null : fromJson(jsonDecode(fromDb));
+
+  @override
+  String? mapToSql(List<PricePoint>? value) => jsonEncode(toJson(value));
 }
 
 @JsonSerializable()

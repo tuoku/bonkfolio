@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../error/wallet_error.dart';
-import '../../models/database.dart';
+import '../../models/wallet.dart';
 
 part 'wallet_event.dart';
 part 'wallet_state.dart';
