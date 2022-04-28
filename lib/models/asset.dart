@@ -12,11 +12,9 @@ class ChartConverter extends TypeConverter<List<PricePoint>?, String>
 
   @override
   List<PricePoint>? fromJson(List<Map<String, dynamic>> json) {
-    if (json == null) {
-      return null;
-    }
+   
 
-    return List.generate(
+   return List.generate(
         json.length,
         (i) => PricePoint(
             id: json[i]['id'],
