@@ -8,7 +8,7 @@ abstract class AssetDetailEvent extends Equatable {
 }
 
 class AssetSelected extends AssetDetailEvent {
-  AssetSelected({required this.asset});
+  const AssetSelected({required this.asset});
   final Asset asset;
 }
 

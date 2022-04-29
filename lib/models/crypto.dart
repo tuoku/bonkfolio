@@ -13,8 +13,7 @@ class Crypto extends Asset {
   final double? inferredAmount;
 
   Crypto(
-      {
-      this.cgId,
+      {this.cgId,
       this.thumbnail,
       this.inferredAmount,
       required double amount,

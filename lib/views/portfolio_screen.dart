@@ -12,7 +12,6 @@ import 'package:shimmer/shimmer.dart';
 import 'dart:io' show Platform;
 
 import '../bloc/asset/asset_bloc.dart';
-import '../models/wallet.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({Key? key, required this.title}) : super(key: key);
@@ -28,20 +27,17 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   final String address =
       //'0xb60010fd99dc4fac1e3834ce20f623f3ede2df14';
       "0x0Ac876efFcde0C614bff9F7cAA1E6bE59668332F";
-  
-
 
   @override
   void initState() {
-   
-         WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
-           context.read<AssetBloc>().add(AssetsRequested(wallets: 
-           await context.read<WalletBloc>().walletRepository.getWallets()));
-          }); 
-        
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
+      context.read<AssetBloc>().add(AssetsRequested(
+          wallets:
+              await context.read<WalletBloc>().walletRepository.getWallets()));
+    });
+
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,15 +63,14 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                       if (string == "Force reload") {
                         //  reload();
                       } else {
-                        
                         //  hidezero = !hidezero;
-                        
+
                       }
                     }, itemBuilder: (BuildContext context) {
                       return [
-                        CheckedPopupMenuItem<String>(
+                        const CheckedPopupMenuItem<String>(
                           value: "Hide zero-ish",
-                          child: const Text("Hide zero-ish"),
+                          child: Text("Hide zero-ish"),
                           enabled: true,
                           //checked: hidezero,
                         ),
@@ -99,15 +94,18 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   refreshTriggerPullDistance: 150.0,
                   refreshIndicatorExtent: 60.0,
                   onRefresh: () async {
-                    context.read<AssetBloc>().add(AssetRefreshRequested());
-                    await Future.delayed(Duration(milliseconds: 50));
-                    while ( context.read<AssetBloc>().state is AssetsRefreshing) {
-                      await Future.delayed(Duration(milliseconds: 50));
+                    context
+                        .read<AssetBloc>()
+                        .add(const AssetRefreshRequested());
+                    await Future.delayed(const Duration(milliseconds: 50));
+                    while (
+                        context.read<AssetBloc>().state is AssetsRefreshing) {
+                      await Future.delayed(const Duration(milliseconds: 50));
                     }
                   }),
               BlocConsumer<WalletBloc, WalletState>(builder: ((context, state) {
                 if (state is WalletInitial) {
-                 // context.read<WalletBloc>().add(WalletsRequested());
+                  // context.read<WalletBloc>().add(WalletsRequested());
                 }
 
                 if (state is WalletsLoaded) {
@@ -123,7 +121,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               }), listener: (context, state) {
                 print("WalletState: $state");
                 if (state is WalletsEmpty || state is WalletInitial) {
-                  context.read<WalletBloc>().add(WalletsRequested());
+                  context.read<WalletBloc>().add(const WalletsRequested());
                 }
               }),
               const SliverPadding(padding: EdgeInsets.only(bottom: 40))
@@ -176,9 +174,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
         ),
         const Text('Total portfolio value'),
         BlocConsumer<AssetBloc, AssetState>(
-          buildWhen: (previous, current) {
-           return current is! AssetsRefreshing;
-          },
+            buildWhen: (previous, current) {
+              return current is! AssetsRefreshing;
+            },
             builder: ((context, state) {
               if (state is AssetsLoaded) {
                 return Text(
@@ -191,8 +189,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               if (state is AssetsLoading) {
                 return Shimmer.fromColors(
                     child: Container(
-                      padding: EdgeInsets.all(10),
-                      margin: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
+                      margin: const EdgeInsets.all(10),
                       width: 150,
                       height: 40,
                       decoration: BoxDecoration(
@@ -202,7 +200,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     baseColor: Colors.grey.shade700,
                     highlightColor: Colors.grey.shade400);
               }
-              return SizedBox();
+              return const SizedBox();
             }),
             listener: (context, state) {}),
         const SizedBox(
@@ -233,11 +231,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
   Widget _assetList() {
     return BlocConsumer<AssetBloc, AssetState>(
       buildWhen: (previous, current) {
-           return current is! AssetsRefreshing;
-          },
-      listener: ((context, state) {
-        
-      }),
+        return current is! AssetsRefreshing;
+      },
+      listener: ((context, state) {}),
       builder: ((context, state) {
         if (state is AssetsLoading) {
           return SliverList(
@@ -247,9 +243,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
           }, childCount: 10));
         }
 
-        if (state is AssetInitial || state is AssetsEmpty) {
-         
-        }
+        if (state is AssetInitial || state is AssetsEmpty) {}
 
         if (state is AssetsLoaded) {
           return SliverList(

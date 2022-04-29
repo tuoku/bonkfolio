@@ -36,13 +36,11 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
 
   Future<void> _onRefreshRequested(
       AssetRefreshRequested event, Emitter<AssetState> emit) async {
-        final s = (state as AssetsLoaded);
-        emit(AssetsRefreshing());
-    final refreshed =
-        await assetRepository.refreshAssets(s.assets);
+    final s = (state as AssetsLoaded);
+    emit(AssetsRefreshing());
+    final refreshed = await assetRepository.refreshAssets(s.assets);
     emit(AssetsLoaded(
         assets: refreshed,
         portfolioValue: assetRepository.getPortfolioValue(refreshed)));
   }
-
 }

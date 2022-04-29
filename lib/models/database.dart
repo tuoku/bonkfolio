@@ -9,9 +9,9 @@ import 'database/db_utils.dart';
 export 'database/shared.dart';
 
 part 'database.g.dart';
+
 @DataClassName('dbWallet')
 class Wallets extends Table {
-
   TextColumn get address => text()();
 
   TextColumn get name => text()();
@@ -47,9 +47,7 @@ class Database extends _$Database {
       onCreate: (Migrator m) {
         return m.createAll();
       },
-      onUpgrade: (Migrator m, int from, int to) async {
-        
-      },
+      onUpgrade: (Migrator m, int from, int to) async {},
       beforeOpen: (details) async {},
     );
   }

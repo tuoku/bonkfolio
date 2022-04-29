@@ -19,7 +19,7 @@ class AssetsRequested extends AssetEvent {
 
 class AssetRefreshRequested extends AssetEvent {
   const AssetRefreshRequested();
-   @override
+  @override
   List<Object> get props => [];
   @override
   String toString() => 'AssetRefreshRequested';

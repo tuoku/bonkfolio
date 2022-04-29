@@ -6,8 +6,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'asset.g.dart';
 
-class ChartConverter
-    extends TypeConverter<List<PricePoint>?, String>
+class ChartConverter extends TypeConverter<List<PricePoint>?, String>
     implements JsonConverter<List<PricePoint>?, List<Map<String, dynamic>>> {
   const ChartConverter();
 

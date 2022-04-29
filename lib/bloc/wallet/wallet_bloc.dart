@@ -26,7 +26,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       } else {
         emit(WalletsEmpty());
       }
-      
     } catch (e) {
       if (kDebugMode) print(e);
       emit(WalletsError(error: e is WalletError ? e : WalletError()));

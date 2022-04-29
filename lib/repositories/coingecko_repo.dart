@@ -25,7 +25,8 @@ class CoinGeckoRepo {
     final m = jsonDecode(res.body);
 
     if (metas
-        .where((element) => element.contract == contract && element.thumbnail != null)
+        .where((element) =>
+            element.contract == contract && element.thumbnail != null)
         .isEmpty) {
       metas.add(AssetMeta(
           contract: contract, thumbnail: m['image']['small'], cgId: m['id']));

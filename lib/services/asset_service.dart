@@ -15,7 +15,6 @@ import 'package:worker_manager/worker_manager.dart';
 import '../models/asset.dart';
 import '../models/wallet.dart';
 
-
 class AssetService {
   final _bscScanApiKey = dotenv.env['BSCSCAN_API_KEY'] ?? "";
   final _etherScanApiKey = dotenv.env['ETHERSCAN_API_KEY'] ?? "";
@@ -386,8 +385,10 @@ class AssetService {
     List<String> cgIds = [];
     for (var contract in contracts) {
       try {
-        cgIds.add(
-            CoinGeckoRepo().metas.firstWhere((e) => e.contract == contract).cgId);
+        cgIds.add(CoinGeckoRepo()
+            .metas
+            .firstWhere((e) => e.contract == contract)
+            .cgId);
       } catch (e) {
         if (kDebugMode) print(e);
       }

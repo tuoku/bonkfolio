@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:bonkfolio/misc/globals.dart';
 // import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/views/scan_screen.dart';
 
@@ -76,7 +75,8 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
             const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16), child: Divider()),
             FutureBuilder<List<Wallet>>(
-              future: Future.delayed(Duration(seconds: 2)),//DatabaseRepo().getWallets(),
+              future: Future.delayed(
+                  const Duration(seconds: 2)), //DatabaseRepo().getWallets(),
               builder: (
                 BuildContext context,
                 AsyncSnapshot<List<Wallet>> snapshot,

@@ -13,4 +13,3 @@ class WalletsRequested extends WalletEvent {
   @override
   String toString() => 'WalletsRequested';
 }
-

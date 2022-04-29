@@ -11,10 +11,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:bonkfolio/misc/globals.dart';
 import 'package:bonkfolio/views/portfolio_screen.dart';
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'package:worker_manager/worker_manager.dart';
 
@@ -81,17 +79,15 @@ class MyApp extends StatelessWidget {
                     return StatefulBuilder(
                       builder: (BuildContext context, setState) {
                         return useVerticalLayout
-                            ? PortfolioScreen(
+                            ? const PortfolioScreen(
                                 title: 'Bonkfolio',
-                                
                               )
                             : Row(
                                 children: [
-                                  Flexible(
+                                  const Flexible(
                                       flex: 7,
                                       child: PortfolioScreen(
                                         title: 'Bonkfolio',
-                                        
                                       )),
                                   Flexible(
                                       flex: 7,
@@ -101,8 +97,7 @@ class MyApp extends StatelessWidget {
                                         builder: ((context, state) {
                                           if (state is AssetActive) {
                                             return AssetDetailsScreen(
-                                                asset: (state as AssetActive)
-                                                    .asset,
+                                                asset: (state).asset,
                                                 pValue: 0);
                                           }
 
