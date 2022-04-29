@@ -3,7 +3,7 @@ import 'package:bonkfolio/misc/globals.dart';
 // import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/views/scan_screen.dart';
 
-import '../models/database.dart';
+import '../models/wallet.dart';
 
 class TrackedSourcesScreen extends StatefulWidget {
   const TrackedSourcesScreen({Key? key}) : super(key: key);

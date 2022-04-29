@@ -13,5 +13,7 @@ class Wallet {
     };
   }
 
+  dbWallet toDb() => dbWallet(address: address, name: name);
+
   factory Wallet.fromDb(dbWallet w) => Wallet(address: w.address, name: w.name);
 }

@@ -69,10 +69,10 @@ class Database extends _$Database {
   /// Updates the row in the database represents this entry by writing the
   /// updated data.
   Future updateWallet(Wallet entry) async {
-    return updateRow(cs, wallets, entry);
+    return updateRow(cs, wallets, entry.toDb());
   }
 
   Future deleteWallet(Wallet entry) {
-    return deleteRow(cs, wallets, entry);
+    return deleteRow(cs, wallets, entry.toDb());
   }
 }
