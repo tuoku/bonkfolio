@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../error/wallet_error.dart';
-import '../../models/database.dart';
+import '../../models/wallet.dart';
 
 part 'wallet_event.dart';
 part 'wallet_state.dart';
@@ -26,7 +26,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       } else {
         emit(WalletsEmpty());
       }
-      
     } catch (e) {
       if (kDebugMode) print(e);
       emit(WalletsError(error: e is WalletError ? e : WalletError()));

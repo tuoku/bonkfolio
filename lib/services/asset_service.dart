@@ -13,7 +13,7 @@ import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:worker_manager/worker_manager.dart';
 
 import '../models/asset.dart';
-import '../models/database.dart';
+import '../models/wallet.dart';
 
 class AssetService {
   final _bscScanApiKey = dotenv.env['BSCSCAN_API_KEY'] ?? "";
@@ -275,7 +275,7 @@ class AssetService {
       return Crypto(
           amountBought: tx.amount,
           inferredAmount: amount,
-          realAmount:
+          amount:
               ((balanceCache[tx.contractAddress.toLowerCase()] ?? BigInt.one) /
                   BigInt.from((pow(10.0, tx.decimals)))),
           price: charts?.last.price ?? 0,
@@ -385,8 +385,10 @@ class AssetService {
     List<String> cgIds = [];
     for (var contract in contracts) {
       try {
-        cgIds.add(
-            CoinGeckoRepo().metas.firstWhere((e) => e.contract == contract).cgId);
+        cgIds.add(CoinGeckoRepo()
+            .metas
+            .firstWhere((e) => e.contract == contract)
+            .cgId);
       } catch (e) {
         if (kDebugMode) print(e);
       }

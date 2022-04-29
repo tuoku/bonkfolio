@@ -1,4 +1,5 @@
 import 'package:bonkfolio/models/database.dart';
+import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/models/database/shared.dart' as shared;
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
@@ -16,9 +17,7 @@ class DatabaseService {
 
   Future<void> insertWallet(Wallet wallet) async {
     await (await db).createWallet(WalletsCompanion(
-        id: Value(wallet.id),
-        address: Value(wallet.address),
-        name: Value(wallet.name)));
+        address: Value(wallet.address), name: Value(wallet.name)));
   }
 
   Future<List<Wallet>> getWallets() async {

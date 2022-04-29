@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
-import 'package:bonkfolio/models/crypto.dart';
 import 'package:bonkfolio/models/crypto_tx.dart';
 
-import 'package:bonkfolio/widgets/asset_graph.dart';
 import 'package:pie_chart/pie_chart.dart';
 
 class AssetDetailsScreen extends StatefulWidget {
@@ -33,7 +31,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-     // enableGraph();
+      // enableGraph();
     });
   }
 
@@ -66,20 +64,22 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
             expandedHeight: 350,
             flexibleSpace: FlexibleSpaceBar(
               stretchModes: const [StretchMode.zoomBackground],
-              background: Stack(children: [
-              graph,
-              Positioned(
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    gradient: 
-                    LinearGradient(
-                      colors: [Colors.black, Colors.transparent],
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter)), ),
-              bottom: 0, )
-              ],
+              background: Stack(
+                children: [
+                  graph,
+                  Positioned(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 50,
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [Colors.black, Colors.transparent],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter)),
+                    ),
+                    bottom: 0,
+                  )
+                ],
               ),
             ),
           ),

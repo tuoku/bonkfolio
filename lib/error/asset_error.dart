@@ -18,4 +18,3 @@ class XScanRateLimitReached extends AssetError {
   @override
   String get message => "XScan ratelimit reached, try again later.";
 }
-

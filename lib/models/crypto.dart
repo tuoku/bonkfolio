@@ -1,13 +1,22 @@
 import 'package:bonkfolio/models/pricepoint.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 import 'asset.dart';
 
+part 'crypto.g.dart';
+
+@JsonSerializable()
 class Crypto extends Asset {
   final String contractAddress;
+  final String? thumbnail;
+  final String? cgId;
+  final double? inferredAmount;
 
   Crypto(
-      {required double inferredAmount,
-      required double realAmount,
+      {this.cgId,
+      this.thumbnail,
+      this.inferredAmount,
+      required double amount,
       required double amountBought,
       required String name,
       required double price,
@@ -17,7 +26,7 @@ class Crypto extends Asset {
       required List<PricePoint>? chart,
       required bool isSupported})
       : super(
-            amount: realAmount,
+            amount: amount,
             amountBought: amountBought,
             avgBuyPrice: avgBuyPrice,
             price: price,
@@ -25,4 +34,9 @@ class Crypto extends Asset {
             name: name,
             chart: chart,
             isSupported: isSupported);
+
+  @override
+  Map<String, dynamic> toJson() => _$CryptoToJson(this);
+  @override
+  Crypto fromJson(json) => _$CryptoFromJson(json);
 }

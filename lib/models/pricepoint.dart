@@ -11,7 +11,5 @@ class PricePoint {
   PricePoint({required this.id, required this.time, required this.price});
 
   static PricePoint fromJson(Map<String, dynamic> e) => _$PricePointFromJson(e);
-  static Map<String,dynamic> toJson(PricePoint e) => _$PricePointToJson(e);
-  
-
+  static Map<String, dynamic> toJson(PricePoint e) => _$PricePointToJson(e);
 }
