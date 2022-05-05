@@ -16,6 +16,9 @@ class Wallets extends Table {
   TextColumn get address => text()();
 
   TextColumn get name => text()();
+
+    @override
+  Set<Column> get primaryKey => {address};
 }
 
 @DataClassName('dbCrypto')
@@ -32,6 +35,9 @@ class Cryptos extends Table {
   RealColumn get avgBuyPrice => real()();
   TextColumn get chart => text().map(const ChartConverter())();
   BoolColumn get isSupported => boolean()();
+
+  @override
+  Set<Column> get primaryKey => {contractAddress};
 }
 
 @DriftDatabase(tables: [Wallets, Cryptos])
@@ -62,7 +68,7 @@ class Database extends _$Database {
   }
 
   Future<void> createWallet(WalletsCompanion entry) async {
-    await into(wallets).insert(entry);
+    await into(wallets).insertOnConflictUpdate(entry);
   }
 
   /// Updates the row in the database represents this entry by writing the
@@ -81,7 +87,7 @@ class Database extends _$Database {
 
   Future insertCryptos(List<Crypto> entries) async {
     await batch((batch) {
-      batch.insertAll(
+      batch.insertAllOnConflictUpdate(
           cryptos,
           entries.map((e) => CryptosCompanion.insert(
               contractAddress: e.contractAddress,

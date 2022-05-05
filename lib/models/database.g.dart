@@ -168,7 +168,7 @@ class $WalletsTable extends Wallets with TableInfo<$WalletsTable, dbWallet> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {address};
   @override
   dbWallet map(Map<String, dynamic> data, {String? tablePrefix}) {
     return dbWallet.fromData(data,
@@ -741,7 +741,7 @@ class $CryptosTable extends Cryptos with TableInfo<$CryptosTable, dbCrypto> {
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  Set<GeneratedColumn> get $primaryKey => {contractAddress};
   @override
   dbCrypto map(Map<String, dynamic> data, {String? tablePrefix}) {
     return dbCrypto.fromData(data,
