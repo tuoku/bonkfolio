@@ -1,3 +1,4 @@
+import 'package:bonkfolio/models/database.dart';
 import 'package:bonkfolio/models/pricepoint.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -39,4 +40,17 @@ class Crypto extends Asset {
   Map<String, dynamic> toJson() => _$CryptoToJson(this);
   @override
   Crypto fromJson(json) => _$CryptoFromJson(json);
+
+  factory Crypto.fromDb(dbCrypto e) => Crypto(
+      amount: e.amount,
+      amountBought: e.amountBought,
+      name: e.name,
+      price: e.price,
+      id: e.id,
+      avgBuyPrice: e.avgBuyPrice,
+      contractAddress: e.contractAddress,
+      chart: e.chart,
+      isSupported: e.isSupported,
+      thumbnail: e.thumbnail,
+      cgId: e.cgId);
 }

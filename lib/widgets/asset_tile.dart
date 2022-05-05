@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
-import 'package:bonkfolio/models/asset_meta.dart';
 import 'package:bonkfolio/models/crypto.dart';
-import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/views/crypto_details_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -56,17 +54,7 @@ class AssetTile extends StatelessWidget {
             },
             autofocus: false,
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(CoinGeckoRepo()
-                  .metas
-                  .firstWhere(
-                      (element) =>
-                          element.contract.toLowerCase() ==
-                          (asset as Crypto).contractAddress.toLowerCase(),
-                      orElse: () => AssetMeta(
-                          contract: "",
-                          thumbnail: "https://via.placeholder.com/150",
-                          cgId: ""))
-                  .thumbnail!),
+              backgroundImage: NetworkImage((asset as Crypto).thumbnail ?? "https://via.placeholder.com/150"),
             ),
             title: Text(
               '${asset.name} ',

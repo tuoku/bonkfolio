@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bonkfolio/bloc/asset/asset_bloc.dart';
 import 'package:bonkfolio/bloc/wallet/wallet_bloc.dart';
+import 'package:bonkfolio/cache/asset_cache.dart';
 import 'package:bonkfolio/repositories/asset_repository.dart';
 import 'package:bonkfolio/repositories/wallet_repository.dart';
 import 'package:bonkfolio/services/asset_service.dart';
@@ -31,22 +32,26 @@ Future main() async {
       statusBarColor: Colors.transparent,
       systemNavigationBarColor: Colors.transparent));
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge).then((_) {
-    runApp(MyApp());
+    runApp(App());
   });
 }
 
-class MyApp extends StatelessWidget {
-  MyApp({Key? key}) : super(key: key);
+class App extends StatelessWidget {
+  App({Key? key}) : super(key: key);
 
   final AssetService assetService = AssetService();
   final DatabaseService databaseService = DatabaseService();
+  final AssetCache assetCache = AssetCache();
 
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
         providers: [
           RepositoryProvider<AssetRepository>(
-              create: (context) => AssetRepository(assetService: assetService)),
+              create: (context) => AssetRepository(
+                  assetService: assetService,
+                  assetCache: assetCache,
+                  databaseService: databaseService)),
           RepositoryProvider<WalletRepository>(
               create: (context) =>
                   WalletRepository(databaseService: databaseService))
@@ -55,8 +60,7 @@ class MyApp extends StatelessWidget {
             providers: [
               BlocProvider<WalletBloc>(
                   create: (context) => WalletBloc(
-                      walletRepository: context.read<WalletRepository>())
-                    ..add(const WalletsRequested())),
+                      walletRepository: context.read<WalletRepository>())),
               BlocProvider<AssetBloc>(
                   create: (context) => AssetBloc(
                       assetRepository: context.read<AssetRepository>())),
