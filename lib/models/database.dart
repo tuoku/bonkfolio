@@ -46,7 +46,7 @@ class Database extends _$Database {
   final cs = ChangeStack();
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -54,7 +54,11 @@ class Database extends _$Database {
       onCreate: (Migrator m) {
         return m.createAll();
       },
-      onUpgrade: (Migrator m, int from, int to) async {},
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (to == 2) {
+          m.createTable(cryptos);
+        }
+      },
       beforeOpen: (details) async {},
     );
   }
