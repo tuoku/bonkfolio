@@ -51,5 +51,6 @@ class Crypto extends Asset {
       contractAddress: e.contractAddress,
       chart: e.chart,
       isSupported: e.isSupported,
-      thumbnail: e.thumbnail);
+      thumbnail: e.thumbnail,
+      cgId: e.cgId);
 }

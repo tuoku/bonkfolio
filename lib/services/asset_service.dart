@@ -266,9 +266,9 @@ class AssetService {
           DateTime.now().difference(txss.first.time).inDays;
       final charts = await CoinGeckoRepo().getChartsByContract(
           tx.contractAddress, tx.platform, daysSinceFirstTx + 15);
-      String? thumb;
+      Map<String, dynamic> info = {};
       if (charts != null) {
-       thumb = await CoinGeckoRepo()
+       info = await CoinGeckoRepo()
             .getThumb(tx.contractAddress, tx.platform);
       }
 
@@ -289,7 +289,8 @@ class AssetService {
           contractAddress: tx.contractAddress,
           chart: charts,
           isSupported: charts != null,
-          thumbnail: thumb);
+          thumbnail: info["thumb"],
+          cgId: info["id"]);
     } else {
       ignoredContracts.add(tx.contractAddress.toLowerCase());
       // clear ignoreds sometime??

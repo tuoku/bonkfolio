@@ -21,11 +21,11 @@ class CoinGeckoRepo {
 
 
 // TODO: possible with single call?
-  Future<String> getThumb(String contract, String platform) async {
+  Future<Map<String,dynamic>> getThumb(String contract, String platform) async {
      http.Response res = await http
         .get(Uri.parse('$_baseUrl/coins/$platform/contract/$contract'));
     final m = jsonDecode(res.body);
-    return  m['image']['small'];
+    return {"thumb": m['image']['small'], "id": m["id"]};
   }
 
   Future<Map> getPricesByIDs(List<String> ids) async {

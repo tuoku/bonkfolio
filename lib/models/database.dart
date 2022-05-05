@@ -93,7 +93,8 @@ class Database extends _$Database {
               avgBuyPrice: e.avgBuyPrice,
               chart: e.chart,
               isSupported: e.isSupported,
-              thumbnail: Value(e.thumbnail))));
+              thumbnail: Value(e.thumbnail),
+              cgId: Value(e.cgId))));
     });
   }
 }
