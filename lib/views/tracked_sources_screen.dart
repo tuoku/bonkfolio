@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 // import 'package:bonkfolio/models/wallet.dart';
 import 'package:bonkfolio/views/scan_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/wallet.dart';
+import '../repositories/wallet_repository.dart';
 
 class TrackedSourcesScreen extends StatefulWidget {
   const TrackedSourcesScreen({Key? key}) : super(key: key);
@@ -56,18 +58,17 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                      /*
-                      DatabaseRepo()
-                          .insertWallet(
-                              Wallet(id: 0, address: qrController.text, name: ""))
-                          .then((v) => GlobalKeys.portfolioKey.currentState!
-                              .initState());
+                      
+                      context.read<WalletRepository>()
+                          .addWallet(
+                              Wallet(address: qrController.text, name: ""));
+                          
                       wallets.insert(walletCount,
-                          Wallet(id: 0,address: qrController.text, name: ""));
+                          Wallet(address: qrController.text, name: ""));
                       walletCount++;
                       listKey.currentState?.insertItem(walletCount - 1,
                           duration: const Duration(milliseconds: 500));
-                          */
+                          
                     },
                     child: const Text("Add"))
               ],
@@ -75,8 +76,7 @@ class _TrackedSourcesScreenState extends State<TrackedSourcesScreen> {
             const Padding(
                 padding: EdgeInsets.symmetric(vertical: 16), child: Divider()),
             FutureBuilder<List<Wallet>>(
-              future: Future.delayed(
-                  const Duration(seconds: 2)), //DatabaseRepo().getWallets(),
+              future: context.read<WalletRepository>().getWallets(), //DatabaseRepo().getWallets(),
               builder: (
                 BuildContext context,
                 AsyncSnapshot<List<Wallet>> snapshot,

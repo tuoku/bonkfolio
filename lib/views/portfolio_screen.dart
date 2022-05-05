@@ -105,7 +105,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                   }),
               BlocConsumer<WalletBloc, WalletState>(builder: ((context, state) {
                 if (state is WalletInitial) {
-                  // context.read<WalletBloc>().add(WalletsRequested());
+                   context.read<WalletBloc>().add(const WalletsRequested());
                 }
 
                 if (state is WalletsLoaded) {
@@ -120,9 +120,7 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                     child: Center(child: Text("Wallets empty")));
               }), listener: (context, state) {
                 if(kDebugMode)  print("WalletState: $state");
-                if (state is WalletsEmpty || state is WalletInitial) {
-                  context.read<WalletBloc>().add(const WalletsRequested());
-                }
+                
               }),
               const SliverPadding(padding: EdgeInsets.only(bottom: 40))
             ]));

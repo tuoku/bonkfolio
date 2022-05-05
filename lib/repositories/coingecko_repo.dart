@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:bonkfolio/models/asset_meta.dart';
+
 import 'package:bonkfolio/models/pricepoint.dart';
 
 class CoinGeckoRepo {
@@ -16,21 +16,16 @@ class CoinGeckoRepo {
   CoinGeckoRepo._internal();
 
   static const _baseUrl = 'https://api.coingecko.com/api/v3';
-  List<AssetMeta> metas = [];
+  
   final Map<String, String> table = {};
 
-  Future<void> getInfosByContract(String contract, String platform) async {
-    http.Response res = await http
+
+// TODO: possible with single call?
+  Future<String> getThumb(String contract, String platform) async {
+     http.Response res = await http
         .get(Uri.parse('$_baseUrl/coins/$platform/contract/$contract'));
     final m = jsonDecode(res.body);
-
-    if (metas
-        .where((element) =>
-            element.contract == contract && element.thumbnail != null)
-        .isEmpty) {
-      metas.add(AssetMeta(
-          contract: contract, thumbnail: m['image']['small'], cgId: m['id']));
-    }
+    return  m['image']['small'];
   }
 
   Future<Map> getPricesByIDs(List<String> ids) async {

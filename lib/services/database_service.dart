@@ -4,6 +4,8 @@ import 'package:bonkfolio/models/database/shared.dart' as shared;
 import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
+import '../models/crypto.dart';
+
 class DatabaseService {
   Database? _db;
   Future<Database> get db async =>
@@ -27,5 +29,13 @@ class DatabaseService {
   Future<void> deleteWallet(String address) async {
     await (await db).deleteWallet(
         walletCache.where((element) => element.address == address).first);
+  }
+
+  Future<List<Crypto>> getCryptos() async {
+    return await (await db).getCryptos();
+  }
+
+  Future<void> insertCryptos(List<Crypto> cryptos) async {
+    await (await db).insertCryptos(cryptos);
   }
 }

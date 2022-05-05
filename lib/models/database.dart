@@ -1,4 +1,5 @@
 import 'package:bonkfolio/models/asset.dart';
+import 'package:bonkfolio/models/crypto.dart';
 import 'package:bonkfolio/models/pricepoint.dart';
 import 'package:bonkfolio/models/wallet.dart';
 import 'package:drift/drift.dart';
@@ -72,5 +73,27 @@ class Database extends _$Database {
 
   Future deleteWallet(Wallet entry) {
     return deleteRow(cs, wallets, entry.toDb());
+  }
+
+  Future<List<Crypto>> getCryptos() {
+    return (select(cryptos).map((p0) => Crypto.fromDb(p0))).get();
+  }
+
+  Future insertCryptos(List<Crypto> entries) async {
+    await batch((batch) {
+      batch.insertAll(
+          cryptos,
+          entries.map((e) => CryptosCompanion.insert(
+              contractAddress: e.contractAddress,
+              amount: e.amount,
+              amountBought: e.amountBought,
+              name: e.name,
+              price: e.price,
+              id: e.id,
+              avgBuyPrice: e.avgBuyPrice,
+              chart: e.chart,
+              isSupported: e.isSupported,
+              thumbnail: Value(e.thumbnail))));
+    });
   }
 }

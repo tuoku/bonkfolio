@@ -12,9 +12,7 @@ class ChartConverter extends TypeConverter<List<PricePoint>?, String>
 
   @override
   List<PricePoint>? fromJson(List<Map<String, dynamic>> json) {
-   
-
-   return List.generate(
+    return List.generate(
         json.length,
         (i) => PricePoint(
             id: json[i]['id'],
@@ -38,8 +36,11 @@ class ChartConverter extends TypeConverter<List<PricePoint>?, String>
   }
 
   @override
-  List<PricePoint>? mapToDart(String? fromDb) =>
-      fromDb == null ? null : fromJson(jsonDecode(fromDb));
+  List<PricePoint>? mapToDart(String? fromDb) => fromDb == null
+      ? null
+      : fromJson((jsonDecode(fromDb) as List)
+          .map((e) => <String, dynamic>{"id": e["id"], "time": e["time"], "price": e["price"]})
+          .toList());
 
   @override
   String? mapToSql(List<PricePoint>? value) => jsonEncode(toJson(value));
