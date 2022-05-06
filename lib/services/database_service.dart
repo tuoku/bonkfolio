@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 
 import '../models/crypto.dart';
+import '../models/crypto_tx.dart';
 
 class DatabaseService {
   Database? _db;
@@ -12,10 +13,6 @@ class DatabaseService {
       _db ??= await shared.constructDb(logStatements: kDebugMode);
 
   List<Wallet> walletCache = [];
-
-  Future<void> init() async {
-    //db = await shared.constructDb(logStatements: kDebugMode);
-  }
 
   Future<void> insertWallet(Wallet wallet) async {
     await (await db).createWallet(WalletsCompanion(
@@ -37,5 +34,13 @@ class DatabaseService {
 
   Future<void> insertCryptos(List<Crypto> cryptos) async {
     await (await db).insertCryptos(cryptos);
+  }
+
+  Future<List<CryptoTX>> getTransactions() async {
+    return await (await db).getTransactions();
+  }
+
+  Future<void> insertTransactions(List<CryptoTX> txs) async {
+    await (await db).insertTransactions(txs);
   }
 }

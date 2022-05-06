@@ -77,7 +77,7 @@ class _AssetGraphState extends State<AssetGraph> {
     map['data'] = widget.data;
     map['charts'] = widget.charts;
     spotss = await compute(calcSpots, map);
-    for (var i = 0; i <= widget.charts.length; i++) {
+    for (var i = 0; i < widget.charts.length; i++) {
       if (i % 10 == 0) {
         reducedChart.add(widget.charts[i]);
       }

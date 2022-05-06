@@ -757,12 +757,457 @@ class $CryptosTable extends Cryptos with TableInfo<$CryptosTable, dbCrypto> {
       const ChartConverter();
 }
 
+class dbCryptoTX extends DataClass implements Insertable<dbCryptoTX> {
+  final DateTime time;
+  final double amount;
+  final String name;
+  final String id;
+  final String action;
+  final String contractAddress;
+  final int decimals;
+  final String clientAddress;
+  final String platform;
+  dbCryptoTX(
+      {required this.time,
+      required this.amount,
+      required this.name,
+      required this.id,
+      required this.action,
+      required this.contractAddress,
+      required this.decimals,
+      required this.clientAddress,
+      required this.platform});
+  factory dbCryptoTX.fromData(Map<String, dynamic> data, {String? prefix}) {
+    final effectivePrefix = prefix ?? '';
+    return dbCryptoTX(
+      time: const DateTimeType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}time'])!,
+      amount: const RealType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}amount'])!,
+      name: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}name'])!,
+      id: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}id'])!,
+      action: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}action'])!,
+      contractAddress: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}contract_address'])!,
+      decimals: const IntType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}decimals'])!,
+      clientAddress: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}client_address'])!,
+      platform: const StringType()
+          .mapFromDatabaseResponse(data['${effectivePrefix}platform'])!,
+    );
+  }
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['time'] = Variable<DateTime>(time);
+    map['amount'] = Variable<double>(amount);
+    map['name'] = Variable<String>(name);
+    map['id'] = Variable<String>(id);
+    map['action'] = Variable<String>(action);
+    map['contract_address'] = Variable<String>(contractAddress);
+    map['decimals'] = Variable<int>(decimals);
+    map['client_address'] = Variable<String>(clientAddress);
+    map['platform'] = Variable<String>(platform);
+    return map;
+  }
+
+  CryptoTXsCompanion toCompanion(bool nullToAbsent) {
+    return CryptoTXsCompanion(
+      time: Value(time),
+      amount: Value(amount),
+      name: Value(name),
+      id: Value(id),
+      action: Value(action),
+      contractAddress: Value(contractAddress),
+      decimals: Value(decimals),
+      clientAddress: Value(clientAddress),
+      platform: Value(platform),
+    );
+  }
+
+  factory dbCryptoTX.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return dbCryptoTX(
+      time: serializer.fromJson<DateTime>(json['time']),
+      amount: serializer.fromJson<double>(json['amount']),
+      name: serializer.fromJson<String>(json['name']),
+      id: serializer.fromJson<String>(json['id']),
+      action: serializer.fromJson<String>(json['action']),
+      contractAddress: serializer.fromJson<String>(json['contractAddress']),
+      decimals: serializer.fromJson<int>(json['decimals']),
+      clientAddress: serializer.fromJson<String>(json['clientAddress']),
+      platform: serializer.fromJson<String>(json['platform']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'time': serializer.toJson<DateTime>(time),
+      'amount': serializer.toJson<double>(amount),
+      'name': serializer.toJson<String>(name),
+      'id': serializer.toJson<String>(id),
+      'action': serializer.toJson<String>(action),
+      'contractAddress': serializer.toJson<String>(contractAddress),
+      'decimals': serializer.toJson<int>(decimals),
+      'clientAddress': serializer.toJson<String>(clientAddress),
+      'platform': serializer.toJson<String>(platform),
+    };
+  }
+
+  dbCryptoTX copyWith(
+          {DateTime? time,
+          double? amount,
+          String? name,
+          String? id,
+          String? action,
+          String? contractAddress,
+          int? decimals,
+          String? clientAddress,
+          String? platform}) =>
+      dbCryptoTX(
+        time: time ?? this.time,
+        amount: amount ?? this.amount,
+        name: name ?? this.name,
+        id: id ?? this.id,
+        action: action ?? this.action,
+        contractAddress: contractAddress ?? this.contractAddress,
+        decimals: decimals ?? this.decimals,
+        clientAddress: clientAddress ?? this.clientAddress,
+        platform: platform ?? this.platform,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('dbCryptoTX(')
+          ..write('time: $time, ')
+          ..write('amount: $amount, ')
+          ..write('name: $name, ')
+          ..write('id: $id, ')
+          ..write('action: $action, ')
+          ..write('contractAddress: $contractAddress, ')
+          ..write('decimals: $decimals, ')
+          ..write('clientAddress: $clientAddress, ')
+          ..write('platform: $platform')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(time, amount, name, id, action,
+      contractAddress, decimals, clientAddress, platform);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is dbCryptoTX &&
+          other.time == this.time &&
+          other.amount == this.amount &&
+          other.name == this.name &&
+          other.id == this.id &&
+          other.action == this.action &&
+          other.contractAddress == this.contractAddress &&
+          other.decimals == this.decimals &&
+          other.clientAddress == this.clientAddress &&
+          other.platform == this.platform);
+}
+
+class CryptoTXsCompanion extends UpdateCompanion<dbCryptoTX> {
+  final Value<DateTime> time;
+  final Value<double> amount;
+  final Value<String> name;
+  final Value<String> id;
+  final Value<String> action;
+  final Value<String> contractAddress;
+  final Value<int> decimals;
+  final Value<String> clientAddress;
+  final Value<String> platform;
+  const CryptoTXsCompanion({
+    this.time = const Value.absent(),
+    this.amount = const Value.absent(),
+    this.name = const Value.absent(),
+    this.id = const Value.absent(),
+    this.action = const Value.absent(),
+    this.contractAddress = const Value.absent(),
+    this.decimals = const Value.absent(),
+    this.clientAddress = const Value.absent(),
+    this.platform = const Value.absent(),
+  });
+  CryptoTXsCompanion.insert({
+    required DateTime time,
+    required double amount,
+    required String name,
+    required String id,
+    required String action,
+    required String contractAddress,
+    required int decimals,
+    required String clientAddress,
+    required String platform,
+  })  : time = Value(time),
+        amount = Value(amount),
+        name = Value(name),
+        id = Value(id),
+        action = Value(action),
+        contractAddress = Value(contractAddress),
+        decimals = Value(decimals),
+        clientAddress = Value(clientAddress),
+        platform = Value(platform);
+  static Insertable<dbCryptoTX> custom({
+    Expression<DateTime>? time,
+    Expression<double>? amount,
+    Expression<String>? name,
+    Expression<String>? id,
+    Expression<String>? action,
+    Expression<String>? contractAddress,
+    Expression<int>? decimals,
+    Expression<String>? clientAddress,
+    Expression<String>? platform,
+  }) {
+    return RawValuesInsertable({
+      if (time != null) 'time': time,
+      if (amount != null) 'amount': amount,
+      if (name != null) 'name': name,
+      if (id != null) 'id': id,
+      if (action != null) 'action': action,
+      if (contractAddress != null) 'contract_address': contractAddress,
+      if (decimals != null) 'decimals': decimals,
+      if (clientAddress != null) 'client_address': clientAddress,
+      if (platform != null) 'platform': platform,
+    });
+  }
+
+  CryptoTXsCompanion copyWith(
+      {Value<DateTime>? time,
+      Value<double>? amount,
+      Value<String>? name,
+      Value<String>? id,
+      Value<String>? action,
+      Value<String>? contractAddress,
+      Value<int>? decimals,
+      Value<String>? clientAddress,
+      Value<String>? platform}) {
+    return CryptoTXsCompanion(
+      time: time ?? this.time,
+      amount: amount ?? this.amount,
+      name: name ?? this.name,
+      id: id ?? this.id,
+      action: action ?? this.action,
+      contractAddress: contractAddress ?? this.contractAddress,
+      decimals: decimals ?? this.decimals,
+      clientAddress: clientAddress ?? this.clientAddress,
+      platform: platform ?? this.platform,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (time.present) {
+      map['time'] = Variable<DateTime>(time.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<String>(action.value);
+    }
+    if (contractAddress.present) {
+      map['contract_address'] = Variable<String>(contractAddress.value);
+    }
+    if (decimals.present) {
+      map['decimals'] = Variable<int>(decimals.value);
+    }
+    if (clientAddress.present) {
+      map['client_address'] = Variable<String>(clientAddress.value);
+    }
+    if (platform.present) {
+      map['platform'] = Variable<String>(platform.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CryptoTXsCompanion(')
+          ..write('time: $time, ')
+          ..write('amount: $amount, ')
+          ..write('name: $name, ')
+          ..write('id: $id, ')
+          ..write('action: $action, ')
+          ..write('contractAddress: $contractAddress, ')
+          ..write('decimals: $decimals, ')
+          ..write('clientAddress: $clientAddress, ')
+          ..write('platform: $platform')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CryptoTXsTable extends CryptoTXs
+    with TableInfo<$CryptoTXsTable, dbCryptoTX> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CryptoTXsTable(this.attachedDatabase, [this._alias]);
+  final VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<DateTime?> time = GeneratedColumn<DateTime?>(
+      'time', aliasedName, false,
+      type: const IntType(), requiredDuringInsert: true);
+  final VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double?> amount = GeneratedColumn<double?>(
+      'amount', aliasedName, false,
+      type: const RealType(), requiredDuringInsert: true);
+  final VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String?> name = GeneratedColumn<String?>(
+      'name', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String?> id = GeneratedColumn<String?>(
+      'id', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _actionMeta = const VerificationMeta('action');
+  @override
+  late final GeneratedColumn<String?> action = GeneratedColumn<String?>(
+      'action', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _contractAddressMeta =
+      const VerificationMeta('contractAddress');
+  @override
+  late final GeneratedColumn<String?> contractAddress =
+      GeneratedColumn<String?>('contract_address', aliasedName, false,
+          type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _decimalsMeta = const VerificationMeta('decimals');
+  @override
+  late final GeneratedColumn<int?> decimals = GeneratedColumn<int?>(
+      'decimals', aliasedName, false,
+      type: const IntType(), requiredDuringInsert: true);
+  final VerificationMeta _clientAddressMeta =
+      const VerificationMeta('clientAddress');
+  @override
+  late final GeneratedColumn<String?> clientAddress = GeneratedColumn<String?>(
+      'client_address', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
+  final VerificationMeta _platformMeta = const VerificationMeta('platform');
+  @override
+  late final GeneratedColumn<String?> platform = GeneratedColumn<String?>(
+      'platform', aliasedName, false,
+      type: const StringType(), requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [
+        time,
+        amount,
+        name,
+        id,
+        action,
+        contractAddress,
+        decimals,
+        clientAddress,
+        platform
+      ];
+  @override
+  String get aliasedName => _alias ?? 'crypto_t_xs';
+  @override
+  String get actualTableName => 'crypto_t_xs';
+  @override
+  VerificationContext validateIntegrity(Insertable<dbCryptoTX> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('time')) {
+      context.handle(
+          _timeMeta, time.isAcceptableOrUnknown(data['time']!, _timeMeta));
+    } else if (isInserting) {
+      context.missing(_timeMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(_amountMeta,
+          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('action')) {
+      context.handle(_actionMeta,
+          action.isAcceptableOrUnknown(data['action']!, _actionMeta));
+    } else if (isInserting) {
+      context.missing(_actionMeta);
+    }
+    if (data.containsKey('contract_address')) {
+      context.handle(
+          _contractAddressMeta,
+          contractAddress.isAcceptableOrUnknown(
+              data['contract_address']!, _contractAddressMeta));
+    } else if (isInserting) {
+      context.missing(_contractAddressMeta);
+    }
+    if (data.containsKey('decimals')) {
+      context.handle(_decimalsMeta,
+          decimals.isAcceptableOrUnknown(data['decimals']!, _decimalsMeta));
+    } else if (isInserting) {
+      context.missing(_decimalsMeta);
+    }
+    if (data.containsKey('client_address')) {
+      context.handle(
+          _clientAddressMeta,
+          clientAddress.isAcceptableOrUnknown(
+              data['client_address']!, _clientAddressMeta));
+    } else if (isInserting) {
+      context.missing(_clientAddressMeta);
+    }
+    if (data.containsKey('platform')) {
+      context.handle(_platformMeta,
+          platform.isAcceptableOrUnknown(data['platform']!, _platformMeta));
+    } else if (isInserting) {
+      context.missing(_platformMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => <GeneratedColumn>{};
+  @override
+  dbCryptoTX map(Map<String, dynamic> data, {String? tablePrefix}) {
+    return dbCryptoTX.fromData(data,
+        prefix: tablePrefix != null ? '$tablePrefix.' : null);
+  }
+
+  @override
+  $CryptoTXsTable createAlias(String alias) {
+    return $CryptoTXsTable(attachedDatabase, alias);
+  }
+}
+
 abstract class _$Database extends GeneratedDatabase {
   _$Database(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   late final $WalletsTable wallets = $WalletsTable(this);
   late final $CryptosTable cryptos = $CryptosTable(this);
+  late final $CryptoTXsTable cryptoTXs = $CryptoTXsTable(this);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [wallets, cryptos];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [wallets, cryptos, cryptoTXs];
 }
