@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bonkfolio/bloc/asset/asset_bloc.dart';
 import 'package:bonkfolio/bloc/wallet/wallet_bloc.dart';
 import 'package:bonkfolio/cache/asset_cache.dart';
+import 'package:bonkfolio/cache/crypto_tx_cache.dart';
 import 'package:bonkfolio/repositories/asset_repository.dart';
 import 'package:bonkfolio/repositories/wallet_repository.dart';
 import 'package:bonkfolio/services/asset_service.dart';
@@ -42,6 +43,7 @@ class App extends StatelessWidget {
   final AssetService assetService = AssetService();
   final DatabaseService databaseService = DatabaseService();
   final AssetCache assetCache = AssetCache();
+  final CryptoTXCache transactionCache = CryptoTXCache();
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +53,8 @@ class App extends StatelessWidget {
               create: (context) => AssetRepository(
                   assetService: assetService,
                   assetCache: assetCache,
-                  databaseService: databaseService)),
+                  databaseService: databaseService,
+                  transactionCache: transactionCache)),
           RepositoryProvider<WalletRepository>(
               create: (context) =>
                   WalletRepository(databaseService: databaseService))

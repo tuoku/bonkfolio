@@ -35,25 +35,14 @@ class AssetService {
   static const ms = Duration(milliseconds: 1);
   
     /// Returns a list of crypto assets found in wallets.
-  Future<List<Crypto>> getAssets(List<Wallet> wallets) async {
-    final futures = <Future>[];
-    for (var wallet in wallets) {
-      futures.add(getTXs(wallet.address.toLowerCase(), wallets));
-      // futures.add(getBNBTXs(address.toLowerCase()));
-    }
-
-    final fetched = await Future.wait(futures);
-    List<CryptoTX> resolved = [];
-    for (var result in fetched) {
-      resolved.addAll(result ?? []);
-    }
-    txCache = resolved;
+  Future<List<Crypto>> getAssets(List<Wallet> wallets, List<CryptoTX> txs) async {
+    
 
     if (kDebugMode) print("TOTAL TXS FOUND: " + txCache.length.toString());
 
     final List<Crypto> assets = [];
     final List<CryptoTX> toBuild = [];
-    for (var tx in resolved) {
+    for (var tx in txs) {
       while (isBuilding) {
         await Future.delayed(ms);
       }

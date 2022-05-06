@@ -1,9 +1,14 @@
+import 'package:bonkfolio/repositories/asset_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
 import 'package:bonkfolio/models/crypto_tx.dart';
 
 import 'package:pie_chart/pie_chart.dart';
+
+import '../models/crypto.dart';
+import '../widgets/asset_graph.dart';
 
 class AssetDetailsScreen extends StatefulWidget {
   final Asset asset;
@@ -31,17 +36,16 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      // enableGraph();
+       enableGraph();
     });
   }
 
   Widget graph = const Center(child: CircularProgressIndicator());
-/*
+
   void enableGraph() {
     setState(() {
       graph = AssetGraph(
-        data: XScanRepo()
-            .txCache
+        data: context.read<AssetRepository>().transactionCache.get()
             .where((element) =>
                 element.contractAddress.toLowerCase() ==
                 (widget.asset as Crypto).contractAddress.toLowerCase())
@@ -50,7 +54,7 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
       );
     });
   }
-*/
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
