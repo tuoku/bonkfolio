@@ -104,9 +104,15 @@ class App extends StatelessWidget {
                                         listener: (context, state) {},
                                         builder: ((context, state) {
                                           if (state is AssetActive) {
-                                            return AssetDetailsScreen(
+                                            return
+                                            FutureBuilder(
+                                              future: Future.delayed(Duration(milliseconds: 0)),
+                                              
+                                              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                                if(snapshot.connectionState == ConnectionState.done) {
+                                                  return AssetDetailsScreen(
                                               asset: (state).asset,
-                                              pValue: 0,
+                                              pValue: (context.read<AssetBloc>().state as AssetsLoaded).portfolioValue,
                                               txs: context
                                                   .read<AssetRepository>()
                                                   .transactionCache
@@ -117,6 +123,10 @@ class App extends StatelessWidget {
                                                           .contractAddress)
                                                   .toList(),
                                             );
+                                                } else return Container(color: Colors.black,);
+                                              },
+                                            );
+                                             
                                           }
 
                                           return Container(

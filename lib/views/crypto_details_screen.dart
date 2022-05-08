@@ -58,7 +58,7 @@ class AssetDetailsScreen extends StatelessWidget {
     
     return Scaffold(
         body: CustomScrollView(
-              cacheExtent: 3500,
+            
             shrinkWrap: false,
             //controller: controller,
             physics: const BouncingScrollPhysics(
