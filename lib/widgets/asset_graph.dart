@@ -77,7 +77,7 @@ class _AssetGraphState extends State<AssetGraph> {
     map['data'] = widget.data;
     map['charts'] = widget.charts;
     spotss = await compute(calcSpots, map);
-    for (var i = 0; i <= widget.charts.length; i++) {
+    for (var i = 0; i < widget.charts.length; i++) {
       if (i % 10 == 0) {
         reducedChart.add(widget.charts[i]);
       }
@@ -96,6 +96,7 @@ class _AssetGraphState extends State<AssetGraph> {
         if (snapshot.hasData) {
           child = snapshot.data;
         } else if (snapshot.hasError) {
+          if(kDebugMode) print(snapshot.error);
           child = const Icon(
             Icons.error_outline,
             color: Colors.red,
@@ -114,15 +115,15 @@ class _AssetGraphState extends State<AssetGraph> {
   LineChartData mainData() {
     return LineChartData(
       lineTouchData: LineTouchData(
-          handleBuiltInTouches: false,
-          enabled: false,
+          handleBuiltInTouches: true,
+          enabled: true,
           touchTooltipData: LineTouchTooltipData(
             getTooltipItems: (touchedSpots) {
               List<LineTooltipItem> items = [];
               for (var spot in touchedSpots) {
+                var date = DateTime.fromMillisecondsSinceEpoch(spot.x.toInt());
                 items.add(LineTooltipItem(
-                    DateTime.fromMillisecondsSinceEpoch(spot.x.toInt())
-                        .toString(),
+                    "${date.day}/${date.month}/${date.year}",
                     const TextStyle()));
               }
               return items;
@@ -131,7 +132,13 @@ class _AssetGraphState extends State<AssetGraph> {
       gridData: FlGridData(
         show: false,
       ),
-      titlesData: FlTitlesData(show: false),
+      titlesData: FlTitlesData(
+          show: false,
+          bottomTitles: AxisTitles(
+              drawBehindEverything: false,
+              sideTitles: SideTitles(getTitlesWidget: ((value, meta) {
+                return Text(meta.formattedValue.substring(0, 5));
+              })))),
       borderData: FlBorderData(
           show: false,
           border: Border.all(color: const Color(0xff37434d), width: 1)),
@@ -169,8 +176,12 @@ class _AssetGraphState extends State<AssetGraph> {
           spots: spotss,
           isCurved: true,
           barWidth: 1,
+          color: Colors.transparent,
           isStrokeCapRound: true,
           dotData: FlDotData(
+            getDotPainter: (p0, p1, p2, p3) {
+              return FlDotCirclePainter(color: Colors.red);
+            },
             show: true,
           ),
         ),
@@ -181,35 +192,35 @@ class _AssetGraphState extends State<AssetGraph> {
 
 Future<List<FlSpot>> calcSpots(map) async {
   try {
-  final data = map['data'];
-  final charts = map['charts'];
-  return List.generate(
-      data.length,
-      (i) => FlSpot(
-          data[i].time.millisecondsSinceEpoch.toDouble(),
-          charts
-              .firstWhere((e) =>
-                  e.time.millisecondsSinceEpoch.toDouble() ==
-                  (charts.fold(
-                      charts[0].time.millisecondsSinceEpoch.toDouble(),
-                      (previousValue, element) =>
-                          (element.time.millisecondsSinceEpoch.toDouble() -
-                                          data[i]
-                                              .time
-                                              .millisecondsSinceEpoch
-                                              .toDouble())
-                                      .abs() <
-                                  ((previousValue as double) -
-                                          data[i]
-                                              .time
-                                              .millisecondsSinceEpoch
-                                              .toDouble())
-                                      .abs()
-                              ? element.time.millisecondsSinceEpoch.toDouble()
-                              : previousValue)))
-              .price));
-} catch(e) {
-  if(kDebugMode) print(e);
-  return [];
-}
+    final data = map['data'];
+    final charts = map['charts'];
+    return List.generate(
+        data.length,
+        (i) => FlSpot(
+            data[i].time.millisecondsSinceEpoch.toDouble(),
+            charts
+                .firstWhere((e) =>
+                    e.time.millisecondsSinceEpoch.toDouble() ==
+                    (charts.fold(
+                        charts[0].time.millisecondsSinceEpoch.toDouble(),
+                        (previousValue, element) =>
+                            (element.time.millisecondsSinceEpoch.toDouble() -
+                                            data[i]
+                                                .time
+                                                .millisecondsSinceEpoch
+                                                .toDouble())
+                                        .abs() <
+                                    ((previousValue as double) -
+                                            data[i]
+                                                .time
+                                                .millisecondsSinceEpoch
+                                                .toDouble())
+                                        .abs()
+                                ? element.time.millisecondsSinceEpoch.toDouble()
+                                : previousValue)))
+                .price));
+  } catch (e) {
+    if (kDebugMode) print(e);
+    return [];
+  }
 }

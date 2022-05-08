@@ -9,18 +9,13 @@ import 'package:bonkfolio/models/crypto_tx.dart';
 import 'package:bonkfolio/models/pricepoint.dart';
 import 'package:bonkfolio/repositories/bonkapi_repo.dart';
 import 'package:bonkfolio/repositories/coingecko_repo.dart';
-import 'package:bonkfolio/repositories/database_repo.dart';
+//import 'package:bonkfolio/repositories/database_repo.dart';
 import 'package:worker_manager/worker_manager.dart';
 
-class XScanRepo {
-  static final XScanRepo _bscScanRepo = XScanRepo._internal();
+import '../models/asset.dart';
+import '../models/wallet.dart';
 
-  factory XScanRepo() {
-    return _bscScanRepo;
-  }
-
-  XScanRepo._internal();
-
+class AssetService {
   final _bscScanApiKey = dotenv.env['BSCSCAN_API_KEY'] ?? "";
   final _etherScanApiKey = dotenv.env['ETHERSCAN_API_KEY'] ?? "";
   final _snowTraceApiKey = dotenv.env['SNOWTRACE_API_KEY'] ?? "";
@@ -28,6 +23,7 @@ class XScanRepo {
   static const _bscScanBaseUrl = 'https://api.bscscan.com/api';
   static const _etherScanBaseUrl = "https://api.etherscan.io/api";
   static const _snowTraceBaseUrl = 'https://api.snowtrace.io/api';
+  static const _bonkApiBaseUrl = "https://bonkapi.herokuapp.com";
 
   List<CryptoTX> txCache = [];
   List<String> ignoredContracts = [];
@@ -37,29 +33,98 @@ class XScanRepo {
   bool balancesFetching = false;
 
   static const ms = Duration(milliseconds: 1);
+  
+    /// Returns a list of crypto assets found in wallets.
+  Future<List<Crypto>> getAssets(List<Wallet> wallets, List<CryptoTX> txs) async {
+    
 
-/*
-  // for bep20 tokens
-  Future<double> getTokenBalance(
-      String address, String contractAddress, int decimals) async {
-    http.Response res = await http.get(Uri.parse(
-        ('$_baseUrl?module=account&action=tokenbalance&contractaddress=$contractAddress&address=$address&tag=latest&apikey=$_apiKey')
-            .replaceAll(' ', '')));
-    print(res.statusCode);
-    var d = double.parse(jsonDecode(res.body)['result']);
+    if (kDebugMode) print("TOTAL TXS FOUND: " + txCache.length.toString());
 
-    return d / pow(10.0, decimals);
+    final List<Crypto> assets = [];
+    final List<CryptoTX> toBuild = [];
+    for (var tx in txs) {
+      while (isBuilding) {
+        await Future.delayed(ms);
+      }
+      if (toBuild
+              .where((e) => e.contractAddress == tx.contractAddress)
+              .isEmpty &&
+          !ignoredContracts.contains(tx.contractAddress.toLowerCase())) {
+        toBuild.add(tx);
+      }
+    }
+    final List<Future> fs = [];
+    final List<String> bscBalancesToGet = [];
+    final List<String> ethBalancesToGet = [];
+    final List<String> avaxBalancesToGet = [];
+    //balanceCache.clear();
+
+    for (var t in toBuild) {
+      switch (t.platform) {
+        case "binance-smart-chain":
+          bscBalancesToGet.add(t.contractAddress);
+          break;
+        case "ethereum":
+          ethBalancesToGet.add(t.contractAddress);
+          break;
+        case "avalanche":
+          avaxBalancesToGet.add(t.contractAddress);
+          break;
+        default:
+          bscBalancesToGet.add(t.contractAddress);
+          break;
+      }
+    }
+
+    final List<Future> balanceFs = [];
+    for (var a in wallets) {
+      balanceFs.add(
+          getRealBalances("binance-smart-chain", bscBalancesToGet, a.address));
+      balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, a.address));
+      balanceFs.add(getRealBalances("avalanche", avaxBalancesToGet, a.address));
+    }
+
+    final balances = await Future.wait(balanceFs);
+    for (Map<String, BigInt> balanceList in balances) {
+      for (MapEntry<String, BigInt> entry in balanceList.entries) {
+        if (balanceCache.containsKey(entry.key)) {
+          balanceCache.update(entry.key, (value) => value += entry.value);
+        } else {
+          balanceCache[entry.key] = entry.value;
+        }
+      }
+    }
+
+    for (var t in toBuild) {
+      fs.add(constructCrypto(t));
+    }
+
+    while (balancesFetching) {
+      await Future.delayed(ms);
+    }
+
+    final built = await Future.wait(fs);
+
+    for (var b in built) {
+      if (b != null) assets.add(b);
+    }
+
+    while (isBuilding) {
+      await Future.delayed(ms);
+    }
+
+    return assets;
   }
-*/
-  Future<List<CryptoTX>?> getTXs(String address) async {
+
+  Future<List<CryptoTX>?> getTXs(String address, List<Wallet> wallets) async {
     List<CryptoTX> allTXs = [];
     List<Future> toFetch = [];
-    final wallets = await DatabaseRepo().getWallets();
     final addresses = wallets.map((e) => e.address.toLowerCase());
 
     for (var url in [_bscScanBaseUrl, _etherScanBaseUrl, _snowTraceBaseUrl]) {
       var apiKey = "";
       switch (url) {
+
         case _bscScanBaseUrl:
           apiKey = _bscScanApiKey;
           break;
@@ -118,14 +183,14 @@ class XScanRepo {
     return allTXs;
   }
 
-  Future<List<CryptoTX>?> getBNBTXs(String address) async {
+  Future<List<CryptoTX>?> getBNBTXs(
+      String address, List<Wallet> wallets) async {
     http.Response res = await http.get(Uri.parse(
         '$_bscScanBaseUrl?module=account&action=txlist&address=$address&startblock=0&endblock=999999999&sort=asc&apikey=$_bscScanApiKey'));
     if (kDebugMode) print(res.statusCode);
     try {
       final txs = jsonDecode(res.body)['result'] as List<dynamic>;
       List<CryptoTX> ls = [];
-      final wallets = await DatabaseRepo().getWallets();
       final addresses = wallets.map((e) => e.address.toLowerCase());
       for (var i = 0; i <= txs.length - 1; i++) {
         if (txs[i]['isError'] == "0") {
@@ -155,91 +220,7 @@ class XScanRepo {
     return null;
   }
 
-  /// Returns a list of crypto assets found in wallet [addresses].
-  Future<List<Crypto>> getAssets(List<String> addresses) async {
-    final futures = <Future>[];
-    for (var address in addresses) {
-      futures.add(getTXs(address.toLowerCase()));
-      // futures.add(getBNBTXs(address.toLowerCase()));
-    }
 
-    final fetched = await Future.wait(futures);
-    List<CryptoTX> resolved = [];
-    for (var result in fetched) {
-      resolved.addAll(result ?? []);
-    }
-    txCache = resolved;
-
-    if (kDebugMode) print("TOTAL TXS FOUND: " + txCache.length.toString());
-
-    final List<Crypto> assets = [];
-    final List<CryptoTX> toBuild = [];
-    for (var tx in resolved) {
-      while (isBuilding) {
-        await Future.delayed(ms);
-      }
-      if (toBuild
-              .where((e) => e.contractAddress == tx.contractAddress)
-              .isEmpty &&
-          !ignoredContracts.contains(tx.contractAddress.toLowerCase())) {
-        toBuild.add(tx);
-      }
-    }
-    final List<Future> fs = [];
-    final List<String> bscBalancesToGet = [];
-    final List<String> ethBalancesToGet = [];
-    final List<String> avaxBalancesToGet = [];
-    //balanceCache.clear();
-
-    for (var t in toBuild) {
-      switch (t.platform) {
-        case "binance-smart-chain":
-          bscBalancesToGet.add(t.contractAddress);
-          break;
-        case "ethereum":
-          ethBalancesToGet.add(t.contractAddress);
-          break;
-        case "avalanche":
-          avaxBalancesToGet.add(t.contractAddress);
-          break;
-        default:
-          bscBalancesToGet.add(t.contractAddress);
-          break;
-      }
-    }
-
-    final List<Future> balanceFs = [];
-    balanceFs.add(
-        getRealBalances("binance-smart-chain", bscBalancesToGet, addresses[0]));
-    balanceFs.add(getRealBalances("ethereum", ethBalancesToGet, addresses[0]));
-    balanceFs
-        .add(getRealBalances("avalanche", avaxBalancesToGet, addresses[0]));
-
-    final balances = await Future.wait(balanceFs);
-    for (var f in balances) {
-      balanceCache.addAll(f);
-    }
-
-    for (var t in toBuild) {
-      fs.add(constructCrypto(t));
-    }
-
-    while (balancesFetching) {
-      await Future.delayed(ms);
-    }
-
-    final built = await Future.wait(fs);
-
-    for (var b in built) {
-      if (b != null) assets.add(b);
-    }
-
-    while (isBuilding) {
-      await Future.delayed(ms);
-    }
-
-    return assets;
-  }
 
   Future<Map<String, BigInt>> getRealBalances(
       platform, contracts, holder) async {
@@ -273,10 +254,11 @@ class XScanRepo {
       final daysSinceFirstTx =
           DateTime.now().difference(txss.first.time).inDays;
       final charts = await CoinGeckoRepo().getChartsByContract(
-          tx.contractAddress, tx.platform, daysSinceFirstTx + 1);
+          tx.contractAddress, tx.platform, daysSinceFirstTx + 15);
+      Map<String, dynamic> info = {};
       if (charts != null) {
-        await CoinGeckoRepo()
-            .getInfosByContract(tx.contractAddress, tx.platform);
+       info = await CoinGeckoRepo()
+            .getThumb(tx.contractAddress, tx.platform);
       }
 
       final avg = await _avgBuyPrice(txs, charts);
@@ -286,7 +268,7 @@ class XScanRepo {
       return Crypto(
           amountBought: tx.amount,
           inferredAmount: amount,
-          realAmount:
+          amount:
               ((balanceCache[tx.contractAddress.toLowerCase()] ?? BigInt.one) /
                   BigInt.from((pow(10.0, tx.decimals)))),
           price: charts?.last.price ?? 0,
@@ -295,7 +277,9 @@ class XScanRepo {
           avgBuyPrice: avg,
           contractAddress: tx.contractAddress,
           chart: charts,
-          isSupported: charts != null);
+          isSupported: charts != null,
+          thumbnail: info["thumb"],
+          cgId: info["id"]);
     } else {
       ignoredContracts.add(tx.contractAddress.toLowerCase());
       // clear ignoreds sometime??
@@ -304,17 +288,7 @@ class XScanRepo {
     }
   }
 
-/*
-// for bep20 tokens
-  Future<double> getBuyAmount(
-      String address, String contractAddress, int decimals) async {
-    http.Response res = await http.get(Uri.parse(
-        ('$_baseUrl?module=account&action=tokentx&contractaddress=$contractAddress&address=$address&page=1&offset=5&startblock=0&endblock=999999999&sort=asc&apikey=$_apiKey')
-            .replaceAll(' ', '')));
-    final r = double.parse((jsonDecode(res.body)['result'][0])['value']);
-    return r / pow(10.0, decimals);
-  }
-*/
+
   Future<double> getBNBBalance(String address) async {
     http.Response res = await http.get(Uri.parse(
         '$_bscScanBaseUrl?module=account&action=balance&address=$address&apikey=$_bscScanApiKey'));
@@ -357,31 +331,92 @@ class XScanRepo {
     if (kDebugMode) print("avgBuyPrice took ${end - start}ms");
     return total;
   }
+
+  Future<Map<String, BigInt>> getTokenBalances(String platform,
+      List<String> contractAddresses, String holderAddress) async {
+    if (contractAddresses.isEmpty ||
+        holderAddress.isEmpty ||
+        platform.isEmpty) {
+      Map<String, BigInt> map = {};
+      map[""] = BigInt.zero;
+      return map;
+    }
+    try {
+      for (var e in contractAddresses) {
+        e.toLowerCase();
+      }
+      String contracts = contractAddresses.join(',');
+      Map<String, BigInt> map = {};
+      http.Response res = await http.get(Uri.parse(
+          "$_bonkApiBaseUrl/tokens/$platform/balances/$contracts/$holderAddress"));
+      final json = jsonDecode(res.body) as List<dynamic>;
+      for (var e in json) {
+        map[(e["contract"] ?? "")] =
+            BigInt.parse((e["balance"] ?? "0")); // change type to BigInt
+      }
+      return map;
+    } catch (e) {
+      Map<String, BigInt> map = {};
+      map[contractAddresses[0]] = BigInt.zero;
+      return map;
+    }
+  }
+
+  Future<List<Asset>> refreshAssets(List<Asset> toRefresh) async {
+    List<String> cgIds = [];
+    for (var asset in toRefresh.where((e) => e.isSupported)) {
+      cgIds.add((asset as Crypto).cgId ?? "");
+    }
+    
+
+    final map = await CoinGeckoRepo().getPricesByIDs(cgIds);
+    final supported =
+        toRefresh.where((element) => element.isSupported).toList();
+    for (var i = 0; i <= supported.length - 1; i++) {
+      Crypto c = (supported[i] as Crypto);
+      c.price = map[c.cgId];
+      supported[i] = c;
+    }
+    toRefresh.removeWhere((element) => element.isSupported);
+    toRefresh.addAll(supported);
+    toRefresh
+        .sort((a, b) => (a.amount * a.price).compareTo(b.amount * b.price));
+
+    return toRefresh.reversed.toList();
+  }
+
+  double getPortfolioValue(List<Asset> assets) {
+    double v = 0.0;
+    for (var e in assets) {
+      v += (e.amount * e.price);
+    }
+    return v;
+  }
 }
 
 double findBuyPrice(map) {
   try {
-  final time = map['time'];
-  final chart = map['chart'];
-  if (chart != null) {
-    return chart
-        .firstWhere((e) =>
-            e.time.millisecondsSinceEpoch.toDouble() ==
-            (chart.fold(
-                chart[0].time.millisecondsSinceEpoch.toDouble(),
-                (previousValue, element) =>
-                    (element.time.millisecondsSinceEpoch.toDouble() -
-                                    time.millisecondsSinceEpoch.toDouble())
-                                .abs() <
-                            ((previousValue as double) -
-                                    time.millisecondsSinceEpoch.toDouble())
-                                .abs()
-                        ? element.time.millisecondsSinceEpoch.toDouble()
-                        : previousValue)))
-        .price;
-  } else {
-    return 0;
-  }
+    final time = map['time'];
+    final chart = map['chart'];
+    if (chart != null) {
+      return chart
+          .firstWhere((e) =>
+              e.time.millisecondsSinceEpoch.toDouble() ==
+              (chart.fold(
+                  chart[0].time.millisecondsSinceEpoch.toDouble(),
+                  (previousValue, element) =>
+                      (element.time.millisecondsSinceEpoch.toDouble() -
+                                      time.millisecondsSinceEpoch.toDouble())
+                                  .abs() <
+                              ((previousValue as double) -
+                                      time.millisecondsSinceEpoch.toDouble())
+                                  .abs()
+                          ? element.time.millisecondsSinceEpoch.toDouble()
+                          : previousValue)))
+          .price;
+    } else {
+      return 0;
+    }
   } catch (e) {
     if (kDebugMode) print(e);
     return 0;

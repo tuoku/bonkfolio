@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:bonkfolio/models/asset.dart';
-import 'package:bonkfolio/models/asset_meta.dart';
 import 'package:bonkfolio/models/crypto.dart';
-import 'package:bonkfolio/repositories/coingecko_repo.dart';
 import 'package:bonkfolio/views/crypto_details_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import '../bloc/asset_detail/asset_detail_bloc.dart';
+import '../misc/globals.dart' as globals;
+import '../repositories/asset_repository.dart';
 
 class AssetTile extends StatelessWidget {
   AssetTile({Key? key, required this.asset, required this.pvalue})
@@ -28,15 +31,28 @@ class AssetTile extends StatelessWidget {
             isThreeLine: false,
             onTap: () {
               if (asset.isSupported) {
-                Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (BuildContext context) => AssetDetailsScreen(
-                      asset: asset,
-                      pValue: pvalue,
+                context
+                    .read<AssetDetailBloc>()
+                    .add(AssetSelected(asset: asset));
+                if (globals.useVerticalLayout) {
+                  Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (BuildContext context) => AssetDetailsScreen(
+                        asset: asset,
+                        pValue: pvalue,
+                        txs: context
+                            .read<AssetRepository>()
+                            .transactionCache
+                            .get()
+                            .where((e) =>
+                                e.contractAddress ==
+                                (asset as Crypto).contractAddress)
+                            .toList(),
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               } else {
                 Fluttertoast.cancel();
                 Fluttertoast.showToast(
@@ -47,17 +63,8 @@ class AssetTile extends StatelessWidget {
             },
             autofocus: false,
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(CoinGeckoRepo()
-                  .metas
-                  .firstWhere(
-                      (element) =>
-                          element.id.toLowerCase() ==
-                          (asset as Crypto).contractAddress.toLowerCase(),
-                      orElse: () => AssetMeta(
-                          id: "",
-                          thumbnail: "https://via.placeholder.com/150",
-                          cgId: ""))
-                  .thumbnail!),
+              backgroundImage: NetworkImage((asset as Crypto).thumbnail ??
+                  "https://via.placeholder.com/150"),
             ),
             title: Text(
               '${asset.name} ',
@@ -73,15 +80,10 @@ class AssetTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                         Text(
-                          (((asset.price - avg) /
-                                          ((asset.price + avg) / 2) *
-                                          100) >=
-                                      0
+                          ((((asset.price - avg) / avg) * 100) >= 0
                                   ? '+'
                                   : "") +
-                              ((asset.price - avg) /
-                                      ((asset.price + avg) / 2) *
-                                      100)
+                              (((asset.price - avg) / avg) * 100)
                                   .toStringAsFixed(2) +
                               "%",
                           style: TextStyle(

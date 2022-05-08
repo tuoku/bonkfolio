@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:bonkfolio/models/asset_meta.dart';
+
 import 'package:bonkfolio/models/pricepoint.dart';
 
 class CoinGeckoRepo {
@@ -16,41 +16,16 @@ class CoinGeckoRepo {
   CoinGeckoRepo._internal();
 
   static const _baseUrl = 'https://api.coingecko.com/api/v3';
-  List<AssetMeta> metas = [];
+  
   final Map<String, String> table = {};
-/*
-  Future<double> getCurrentPrice(String id) async {
-    if (id == "") return 0;
 
-    http.Response res = await http.get(Uri.parse(
-        '$_baseUrl/coins/$id?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=false'));
-    final m = ((jsonDecode(res.body)['image'])['small']);
-    if (metas
-        .where((element) => element.id == id && element.thumbnail != null)
-        .isEmpty) {
-      metas.add(AssetMeta(id: (jsonDecode(res.body)['symbol']), thumbnail: m));
-    }
-    var d = 0.0;
-    try {
-      d = (jsonDecode(res.body)['market_data']['current_price'])['usd'];
-    } catch (e) {
-      print(e);
-    }
 
-    return d;
-  }
-*/
-  Future<void> getInfosByContract(String contract, String platform) async {
-    http.Response res = await http
+// TODO: possible with single call?
+  Future<Map<String,dynamic>> getThumb(String contract, String platform) async {
+     http.Response res = await http
         .get(Uri.parse('$_baseUrl/coins/$platform/contract/$contract'));
     final m = jsonDecode(res.body);
-
-    if (metas
-        .where((element) => element.id == contract && element.thumbnail != null)
-        .isEmpty) {
-      metas.add(AssetMeta(
-          id: contract, thumbnail: m['image']['small'], cgId: m['id']));
-    }
+    return {"thumb": m['image']['small'], "id": m["id"]};
   }
 
   Future<Map> getPricesByIDs(List<String> ids) async {
