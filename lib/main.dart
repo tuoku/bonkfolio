@@ -20,6 +20,7 @@ import 'package:worker_manager/worker_manager.dart';
 
 import 'bloc/asset_detail/asset_detail_bloc.dart';
 import 'misc/globals.dart' as globals;
+import 'models/crypto.dart';
 
 Future main() async {
   await Executor().warmUp(
@@ -104,8 +105,18 @@ class App extends StatelessWidget {
                                         builder: ((context, state) {
                                           if (state is AssetActive) {
                                             return AssetDetailsScreen(
-                                                asset: (state).asset,
-                                                pValue: 0);
+                                              asset: (state).asset,
+                                              pValue: 0,
+                                              txs: context
+                                                  .read<AssetRepository>()
+                                                  .transactionCache
+                                                  .get()
+                                                  .where((e) =>
+                                                      e.contractAddress ==
+                                                      ((state).asset as Crypto)
+                                                          .contractAddress)
+                                                  .toList(),
+                                            );
                                           }
 
                                           return Container(

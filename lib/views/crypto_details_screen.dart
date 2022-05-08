@@ -10,67 +10,69 @@ import 'package:pie_chart/pie_chart.dart';
 import '../models/crypto.dart';
 import '../widgets/asset_graph.dart';
 
-class AssetDetailsScreen extends StatefulWidget {
+class AssetDetailsScreen extends StatelessWidget {
   final Asset asset;
-  final List<CryptoTX> txs = [];
+  final List<CryptoTX> txs;
   final double pValue;
+  final controller = ScrollController();
+  final nf = NumberFormat.compact();
 
   AssetDetailsScreen({
     Key? key,
     required this.asset,
     required this.pValue,
+    required this.txs,
   }) : super(
           key: key,
         );
-  @override
-  State<AssetDetailsScreen> createState() => AssetDetailsScreenState();
-}
 
-class AssetDetailsScreenState extends State<AssetDetailsScreen> {
-  final nf = NumberFormat.compact();
-  List<CryptoTX> txs = [];
-
-  AssetDetailsScreenState({Key? key});
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-       enableGraph();
-    });
+  Widget _infoTile(String title, Widget child) {
+    return SizedBox(
+        width: null,
+        height: null,
+        child: Card(
+          borderOnForeground: false,
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Text(
+                title,
+                style: TextStyle(fontSize: 15),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              child,
+              const SizedBox(
+                height: 10,
+              ),
+            ],
+          ),
+        ));
   }
 
-  Widget graph = const Center(child: CircularProgressIndicator());
-
-  void enableGraph() {
-    setState(() {
-      graph = AssetGraph(
-        data: context.read<AssetRepository>().transactionCache.get()
-            .where((element) =>
-                element.contractAddress.toLowerCase() ==
-                (widget.asset as Crypto).contractAddress.toLowerCase())
-            .toList(),
-        charts: widget.asset.chart!,
-      );
-    });
-  }
+  
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
         body: CustomScrollView(
+              cacheExtent: 3500,
+            shrinkWrap: false,
+            //controller: controller,
             physics: const BouncingScrollPhysics(
                 parent: AlwaysScrollableScrollPhysics()),
             slivers: [
           SliverAppBar(
             stretch: true,
-            title: Text(widget.asset.name),
+            title: Text(asset.name),
             expandedHeight: 350,
             flexibleSpace: FlexibleSpaceBar(
               stretchModes: const [StretchMode.zoomBackground],
               background: Stack(
                 children: [
-                  graph,
+                  AssetGraph(data: txs, charts: asset.chart!),
                   Positioned(
                     child: Container(
                       width: MediaQuery.of(context).size.width,
@@ -88,207 +90,85 @@ class AssetDetailsScreenState extends State<AssetDetailsScreen> {
             ),
           ),
           SliverList(
-              delegate: SliverChildListDelegate.fixed([
-            Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Card(
-                          borderOnForeground: false,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Amount holding',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                nf.format(widget.asset.amount),
-                                style: const TextStyle(fontSize: 30),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Card(
-                          borderOnForeground: false,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Reflections earned',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                nf.format(widget.asset.amount -
-                                    widget.asset.amountBought),
-                                style: const TextStyle(fontSize: 30),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Card(
-                          borderOnForeground: false,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Unrealized PnL',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                '\$${(widget.asset.amount * widget.asset.price - widget.asset.amount * widget.asset.avgBuyPrice).toStringAsFixed(2)}',
-                                style: const TextStyle(fontSize: 30),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+            delegate: SliverChildListDelegate.fixed([
+            Wrap(
+              children: [
+                _infoTile(
+                    'Amount holding',
+                    Text(
+                      nf.format(asset.amount),
+                      style: const TextStyle(fontSize: 30),
+                    )),
+                _infoTile(
+                    'Reflections earned',
+                    Text(
+                      nf.format(asset.amount - asset.amountBought),
+                      style: const TextStyle(fontSize: 30),
+                    )),
+                _infoTile(
+                  'Unrealized PnL',
+                  Text(
+                    '\$${(asset.amount * asset.price - asset.amount * asset.avgBuyPrice).toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 30),
                   ),
-                  Column(
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: Card(
-                          borderOnForeground: false,
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 10),
-                              const Text(
-                                'Cash value',
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                '\$' +
-                                    (widget.asset.amount * widget.asset.price)
-                                        .toStringAsFixed(2),
-                                style: const TextStyle(fontSize: 30),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Text(
-                                  '${(((widget.asset.amount * widget.asset.price) / widget.pValue) * 100).toStringAsFixed(1)}% of portfolio'),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              PieChart(
-                                gradientList: const [
-                                  [
-                                    Color(0xff23b6e6),
-                                    Color(0xff02d39a),
-                                  ],
-                                ],
-                                chartRadius:
-                                    MediaQuery.of(context).size.width * 0.3,
-                                dataMap: {
-                                  'other': 100 -
-                                      ((widget.asset.amount *
-                                                  widget.asset.price) /
-                                              widget.pValue) *
-                                          100,
-                                  'this': ((widget.asset.amount *
-                                              widget.asset.price) /
-                                          widget.pValue) *
-                                      100,
-                                },
-                                chartType: ChartType.ring,
-                                legendOptions:
-                                    const LegendOptions(showLegends: false),
-                                chartValuesOptions: const ChartValuesOptions(
-                                    showChartValues: false),
-                              ),
-                              const SizedBox(height: 15),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Card(
-                    borderOnForeground: false,
-                    child: Column(
+                ),
+                _infoTile(
+                    'Cash value',
+                    Column(
                       children: [
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Weighted average buy price',
-                          style: TextStyle(fontSize: 15),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
                         Text(
-                          widget.asset.avgBuyPrice.toString(),
+                          '\$' +
+                              (asset.amount * asset.price).toStringAsFixed(2),
                           style: const TextStyle(fontSize: 30),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                      ],
-                    ),
-                  )),
-              SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Card(
-                    borderOnForeground: false,
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Current price',
-                          style: TextStyle(fontSize: 15),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
                         Text(
-                          widget.asset.price.toString(),
-                          style: const TextStyle(fontSize: 30),
-                        ),
+                            '${(((asset.amount * asset.price) / pValue) * 100).toStringAsFixed(1)}% of portfolio'),
                         const SizedBox(
-                          height: 10,
+                          height: 20,
                         ),
-                      ],
-                    ),
-                  )),
-            ]),
-          ]))
+                        PieChart(
+                          gradientList: const [
+                            [
+                              Color(0xff23b6e6),
+                              Color(0xff02d39a),
+                            ],
+                          ],
+                          chartRadius: MediaQuery.of(context).size.width * 0.3,
+                          dataMap: {
+                            'this':
+                                ((asset.amount * asset.price)) ,
+                          },
+                          totalValue: pValue,
+                          baseChartColor: Colors.grey[50]!.withOpacity(0.15),
+                          chartType: ChartType.ring,
+                          legendOptions:
+                              const LegendOptions(showLegends: false),
+                          chartValuesOptions:
+                              const ChartValuesOptions(showChartValues: false),
+                        )
+                      ]
+                )),
+                _infoTile(
+                  'Weighted average buy price',
+                  Text(
+                    asset.avgBuyPrice.toString(),
+                    style: const TextStyle(fontSize: 30),
+                  ),
+                ),
+                _infoTile(
+                  'Current price',
+                  Text(
+                    asset.price.toString(),
+                    style: const TextStyle(fontSize: 30),
+                  ),
+                ),
+              ],
+            ),
+            ])
+          )
         ]));
   }
 }
