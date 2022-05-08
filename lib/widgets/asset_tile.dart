@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import '../bloc/asset_detail/asset_detail_bloc.dart';
 import '../misc/globals.dart' as globals;
+import '../repositories/asset_repository.dart';
 
 class AssetTile extends StatelessWidget {
   AssetTile({Key? key, required this.asset, required this.pvalue})
@@ -40,6 +41,14 @@ class AssetTile extends StatelessWidget {
                       builder: (BuildContext context) => AssetDetailsScreen(
                         asset: asset,
                         pValue: pvalue,
+                        txs: context
+                            .read<AssetRepository>()
+                            .transactionCache
+                            .get()
+                            .where((e) =>
+                                e.contractAddress ==
+                                (asset as Crypto).contractAddress)
+                            .toList(),
                       ),
                     ),
                   );
@@ -54,7 +63,8 @@ class AssetTile extends StatelessWidget {
             },
             autofocus: false,
             leading: CircleAvatar(
-              backgroundImage: NetworkImage((asset as Crypto).thumbnail ?? "https://via.placeholder.com/150"),
+              backgroundImage: NetworkImage((asset as Crypto).thumbnail ??
+                  "https://via.placeholder.com/150"),
             ),
             title: Text(
               '${asset.name} ',

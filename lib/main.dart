@@ -20,6 +20,7 @@ import 'package:worker_manager/worker_manager.dart';
 
 import 'bloc/asset_detail/asset_detail_bloc.dart';
 import 'misc/globals.dart' as globals;
+import 'models/crypto.dart';
 
 Future main() async {
   await Executor().warmUp(
@@ -103,9 +104,29 @@ class App extends StatelessWidget {
                                         listener: (context, state) {},
                                         builder: ((context, state) {
                                           if (state is AssetActive) {
-                                            return AssetDetailsScreen(
-                                                asset: (state).asset,
-                                                pValue: 0);
+                                            return
+                                            FutureBuilder(
+                                              future: Future.delayed(Duration(milliseconds: 0)),
+                                              
+                                              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                                                if(snapshot.connectionState == ConnectionState.done) {
+                                                  return AssetDetailsScreen(
+                                              asset: (state).asset,
+                                              pValue: (context.read<AssetBloc>().state as AssetsLoaded).portfolioValue,
+                                              txs: context
+                                                  .read<AssetRepository>()
+                                                  .transactionCache
+                                                  .get()
+                                                  .where((e) =>
+                                                      e.contractAddress ==
+                                                      ((state).asset as Crypto)
+                                                          .contractAddress)
+                                                  .toList(),
+                                            );
+                                                } else return Container(color: Colors.black,);
+                                              },
+                                            );
+                                             
                                           }
 
                                           return Container(

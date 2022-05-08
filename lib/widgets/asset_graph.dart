@@ -96,6 +96,7 @@ class _AssetGraphState extends State<AssetGraph> {
         if (snapshot.hasData) {
           child = snapshot.data;
         } else if (snapshot.hasError) {
+          if(kDebugMode) print(snapshot.error);
           child = const Icon(
             Icons.error_outline,
             color: Colors.red,
