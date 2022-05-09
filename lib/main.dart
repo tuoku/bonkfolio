@@ -10,6 +10,7 @@ import 'package:bonkfolio/services/asset_service.dart';
 import 'package:bonkfolio/services/database_service.dart';
 import 'package:bonkfolio/views/crypto_details_screen.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -72,6 +73,9 @@ class App extends StatelessWidget {
                   create: ((context) => AssetDetailBloc()))
             ],
             child: MaterialApp(
+              scrollBehavior: MaterialScrollBehavior().copyWith(
+        dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},
+      ),
                 title: 'Flutter Demo',
                 theme: ThemeData(
                   brightness: Brightness.dark,

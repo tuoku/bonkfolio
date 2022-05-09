@@ -9,6 +9,8 @@ import 'package:pie_chart/pie_chart.dart';
 
 import '../models/crypto.dart';
 import '../widgets/asset_graph.dart';
+import '../misc/globals.dart' as globals;
+
 
 class AssetDetailsScreen extends StatelessWidget {
   final Asset asset;
@@ -26,11 +28,12 @@ class AssetDetailsScreen extends StatelessWidget {
           key: key,
         );
 
-  Widget _infoTile(String title, Widget child) {
+  Widget _infoTile({required String title, required Widget child, double? height, double? width}) {
     return SizedBox(
-        width: null,
-        height: null,
+        width: width,
+        height: height,
         child: Card(
+          
           borderOnForeground: false,
           child: Column(
             children: [
@@ -51,14 +54,10 @@ class AssetDetailsScreen extends StatelessWidget {
         ));
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
         body: CustomScrollView(
-            
             shrinkWrap: false,
             //controller: controller,
             physics: const BouncingScrollPhysics(
@@ -90,85 +89,90 @@ class AssetDetailsScreen extends StatelessWidget {
             ),
           ),
           SliverList(
-            delegate: SliverChildListDelegate.fixed([
+              delegate: SliverChildListDelegate.fixed([
             Wrap(
+              runAlignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.start,
               children: [
-                _infoTile(
-                    'Amount holding',
-                    Text(
-                      nf.format(asset.amount),
-                      style: const TextStyle(fontSize: 30),
-                    )),
-                _infoTile(
-                    'Reflections earned',
-                    Text(
-                      nf.format(asset.amount - asset.amountBought),
-                      style: const TextStyle(fontSize: 30),
-                    )),
-                _infoTile(
-                  'Unrealized PnL',
-                  Text(
-                    '\$${(asset.amount * asset.price - asset.amount * asset.avgBuyPrice).toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 30),
-                  ),
+                Column(
+                  children: [
+                    _infoTile(
+                      width: globals.useVerticalLayout ? MediaQuery.of(context).size.width * 0.5 : MediaQuery.of(context).size.width * 0.25,
+                        title: 'Amount holding',
+                        child: Text(
+                          nf.format(asset.amount),
+                          style: const TextStyle(fontSize: 30),
+                        )),
+                    _infoTile(
+                      width: globals.useVerticalLayout ? MediaQuery.of(context).size.width * 0.5 : MediaQuery.of(context).size.width * 0.25,
+                        title: 'Reflections earned',
+                        child: Text(
+                          nf.format(asset.amount - asset.amountBought),
+                          style: const TextStyle(fontSize: 30),
+                        )),
+                    _infoTile(
+                      width: globals.useVerticalLayout ? MediaQuery.of(context).size.width * 0.5 : MediaQuery.of(context).size.width * 0.25,
+                        title: 'Unrealized PnL',
+                        child: Text(
+                          '\$${(asset.amount * asset.price - asset.amount * asset.avgBuyPrice).toStringAsFixed(2)}',
+                          style: const TextStyle(fontSize: 30),
+                        )),
+                  ],
                 ),
                 _infoTile(
-                    'Cash value',
-                    Column(
-                      children: [
-                        Text(
-                          '\$' +
-                              (asset.amount * asset.price).toStringAsFixed(2),
-                          style: const TextStyle(fontSize: 30),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                            '${(((asset.amount * asset.price) / pValue) * 100).toStringAsFixed(1)}% of portfolio'),
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        PieChart(
-                          gradientList: const [
-                            [
-                              Color(0xff23b6e6),
-                              Color(0xff02d39a),
-                            ],
+                  width: globals.useVerticalLayout ? MediaQuery.of(context).size.width * 0.5 : MediaQuery.of(context).size.width * 0.25,
+                    title: 'Cash value',
+                    child: Column(children: [
+                      Text(
+                        '\$' + (asset.amount * asset.price).toStringAsFixed(2),
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      Text(
+                          '${(((asset.amount * asset.price) / pValue) * 100).toStringAsFixed(1)}% of portfolio'),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      PieChart(
+                        gradientList: const [
+                          [
+                            Color(0xff23b6e6),
+                            Color(0xff02d39a),
                           ],
-                          chartRadius: MediaQuery.of(context).size.width * 0.3,
-                          dataMap: {
-                            'this':
-                                ((asset.amount * asset.price)) ,
-                          },
-                          totalValue: pValue,
-                          baseChartColor: Colors.grey[50]!.withOpacity(0.15),
-                          chartType: ChartType.ring,
-                          legendOptions:
-                              const LegendOptions(showLegends: false),
-                          chartValuesOptions:
-                              const ChartValuesOptions(showChartValues: false),
-                        )
-                      ]
-                )),
+                        ],
+                        chartRadius: globals.useVerticalLayout ? MediaQuery.of(context).size.width * 0.3 : MediaQuery.of(context).size.width * 0.1,
+                        dataMap: {
+                          'this': ((asset.amount * asset.price)),
+                        },
+                        totalValue: pValue,
+                        baseChartColor: Colors.grey[50]!.withOpacity(0.15),
+                        chartType: ChartType.ring,
+                        legendOptions: const LegendOptions(showLegends: false),
+                        chartValuesOptions:
+                            const ChartValuesOptions(showChartValues: false),
+                      )
+                    ])),
                 _infoTile(
-                  'Weighted average buy price',
-                  Text(
+                  width: MediaQuery.of(context).size.width,
+                  title: 'Weighted average buy price',
+                  child: Text(
                     asset.avgBuyPrice.toString(),
                     style: const TextStyle(fontSize: 30),
                   ),
                 ),
                 _infoTile(
-                  'Current price',
-                  Text(
+                  width: MediaQuery.of(context).size.width,
+                 title: 'Current price',
+                 child: Text(
                     asset.price.toString(),
                     style: const TextStyle(fontSize: 30),
                   ),
                 ),
               ],
             ),
-            ])
-          )
+          ]))
         ]));
   }
 }
